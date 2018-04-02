@@ -52,10 +52,17 @@ public class SearchBusStepActivity extends BaseActivity implements BusStationSea
                showLine(position);
             }
         });
+        String name=getIntent().getStringExtra("stationName");
+        if (name!=null){
+            searchBusStep(name);
+        }
+
     }
 
     private void showLine(int position) {
-
+        Intent intent=new Intent(this,SearchBusLineActivity.class);
+        intent.putExtra("busId",list.get(position).getBusLineId());
+        startActivity(intent);
     }
 
 
@@ -75,11 +82,12 @@ public class SearchBusStepActivity extends BaseActivity implements BusStationSea
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode==SEARCH_BUS_STEP&&resultCode==RESULT_OK){
-            searchBusStep((Tip) data.getBundleExtra("tip").getParcelable("tip"));
+            Tip tip=data.getBundleExtra("tip").getParcelable("tip");
+            searchBusStep(tip.getName());
         }
     }
-    private void searchBusStep(Tip tip){
-        BusStationQuery query=new BusStationQuery(tip.getName(), Test.getInstance().cityCode);
+    private void searchBusStep(String stationName){
+        BusStationQuery query=new BusStationQuery(stationName, Test.getInstance().cityCode);
         BusStationSearch search=new BusStationSearch(this,query);
         search.setOnBusStationSearchListener(this);
         search.searchBusStationAsyn();

@@ -59,18 +59,23 @@ public class SearchBusLineActivity extends BaseActivity implements BusLineSearch
             }
         });
 
-
         name = findViewById(R.id.bus_line_name);
         first = findViewById(R.id.first_bus);
         last = findViewById(R.id.last_bus);
         distance = findViewById(R.id.bus_line_distance);
         price = findViewById(R.id.bus_price);
 
+        String busId=getIntent().getStringExtra("busId");
+        if (busId!=null){
+            searchBusLine(busId);
+        }
 
     }
 
     private void showStep(int position) {
-
+        Intent intent=new Intent(this,SearchBusStepActivity.class);
+        intent.putExtra("stationName",list.get(position).getBusStationName());
+        startActivity(intent);
     }
 
 
@@ -100,15 +105,16 @@ public class SearchBusLineActivity extends BaseActivity implements BusLineSearch
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode==SEARCH_BUS_LINT){
             if (resultCode==RESULT_OK){
-                searchBusLine((Tip) data.getBundleExtra("tip").getParcelable("tip"));
+                Tip tip=data.getBundleExtra("tip").getParcelable("tip");
+                searchBusLine(tip.getPoiID());
             }
         }
     }
 
 
-    private void searchBusLine(Tip tip) {
+    private void searchBusLine(String poiId) {
         //路线查询
-        BusLineQuery busLineQuery = new BusLineQuery(tip.getPoiID(), BusLineQuery.SearchType.BY_LINE_ID, Test.getInstance().cityCode);
+        BusLineQuery busLineQuery = new BusLineQuery(poiId, BusLineQuery.SearchType.BY_LINE_ID, Test.getInstance().cityCode);
         BusLineSearch busLineSearch = new BusLineSearch(this, busLineQuery);
         busLineSearch.setOnBusLineSearchListener(this);
         busLineSearch.searchBusLineAsyn();
