@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#e4e4e4"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--<include layout="@layout/toolbar"/>-->
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingTop="5dp"
+        android:background="@color/colorWhite"
+        android:layout_gravity="left|bottom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <android.support.design.widget.BottomNavigationView
+            android:id="@+id/coll"
+            android:background="?android:attr/windowBackground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:menu="@menu/collection">
+        </android.support.design.widget.BottomNavigationView>
+
+        <android.support.v4.view.ViewPager
+            android:orientation="vertical"
+            android:id="@+id/collection_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v4.view.ViewPager>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true"
+                app:counterMaxLength="15">
+
+                <EditText
+                    android:id="@+id/username_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="用户名"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true">
+
+                <EditText
+                    android:id="@+id/telephone_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="电话号码"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true">
+
+                <EditText
+                    android:id="@+id/introduce_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="个人简介"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_weight="4"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true">
+
+                <EditText
+                    android:id="@+id/gender_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="性别"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_weight="4"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:scrollbarAlwaysDrawHorizontalTrack="true">
+
+                <EditText
+                    android:id="@+id/birthday_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="生日"
+                    android:inputType="text" />
+            </android.support.design.widget.TextInputLayout>
+
+
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:background="#ff4a4a"
+                android:text="退出登录"
+                android:textColor="#fff" />
+            <!--    <fragment
+                    android:id="@+id/pref_content"
+                    android:layout_weight="10"
+                    android:layout_below="@id/t"
+                    android:layout_above="@id/logout"
+                    android:name="com.example.y.routeplanner.fragment.SettingFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>-->
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+</LinearLayout>

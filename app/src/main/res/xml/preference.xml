@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    <PreferenceCategory
+        android:title="当前城市">
+        <ListPreference
+            android:key="list_preference"
+            android:title="当前城市"
+            android:summary="选择"
+            android:dialogTitle="选择"
+            />
+    </PreferenceCategory>-->
+    <PreferenceCategory
+       >
+        <EditTextPreference
+            android:key="username"
+            android:title="用户名"
+            android:summary="username"
+            android:dialogTitle="请输入用户名"
+            />
+        <ListPreference
+            android:dialogTitle="选择"
+            android:entries="@array/gender_list_prf"
+            android:entryValues="@array/gender_value_list_prf"
+            android:key="gender"
+            android:summary="男"
+            android:title="性别" />
+        <Preference
+            android:key="birthday"
+            android:title="生日"
+            android:summary="2018-01-01"
+            />
+        <EditTextPreference
+            android:key="telephone"
+            android:title="手机号码"
+            android:summary="18711112222"
+            android:dialogTitle="请输入号码"
+            />
+        <EditTextPreference
+            android:key="introduce"
+            android:title="个人简介"
+            android:summary="点击设置"
+            android:dialogTitle="请输入"
+            />
+    </PreferenceCategory>
+</PreferenceScreen>
