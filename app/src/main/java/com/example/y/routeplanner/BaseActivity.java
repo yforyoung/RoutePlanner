@@ -27,8 +27,9 @@ public class BaseActivity extends AppCompatActivity {
     private static final int SHOW_TOAST=1;
     public static final int SEARCH_POINT=1;
     public static final int SEARCH_START_POINT=2;
-    public static final int SEARCH_END_POINT=2;
+    public static final int SEARCH_END_POINT=3;
     public static final int SEARCH_BUS_LINT=4;
+    public static final int SEARCH_BUS_STEP=5;
 
 
     @SuppressLint("HandlerLeak")
@@ -84,6 +85,7 @@ public class BaseActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, SearchTipActivity.class);
+                intent.putExtra("requestCode",requestCode);
                 startActivityForResult(intent, requestCode);
             }
         });

@@ -2,9 +2,7 @@ package com.example.y.routeplanner.gson;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by yforyoung on 2018/3/21.
- */
+
 
 public class CollectionRoute {
     @SerializedName("collection_id")

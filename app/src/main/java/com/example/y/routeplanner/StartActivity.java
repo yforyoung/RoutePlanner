@@ -162,6 +162,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             case R.id.search_bus_step:
                 intent.setClass(this,SearchBusStepActivity.class);
                 startActivity(intent);
+                break;
             case R.id.collection:
                 intent.setClass(this,CollectionActivity.class);
                 startActivity(intent);

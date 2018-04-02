@@ -18,9 +18,9 @@ import java.util.List;
  * Created by yforyoung on 2018/3/10.
  */
 
-public class LocalAdapter extends RecyclerView.Adapter<LocalAdapter.ViewHolder> implements AdapterView.OnClickListener{
+public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ViewHolder> implements AdapterView.OnClickListener{
 
-    private List<Tip> tipList=new ArrayList<>();
+    private List<Tip> tipList;
     private OnItemClickListener onItemClickListener=null;
 
     @Override
@@ -35,7 +35,7 @@ public class LocalAdapter extends RecyclerView.Adapter<LocalAdapter.ViewHolder> 
         void onItemClick(View v,int position);
     }
 
-    public LocalAdapter(List<Tip> tipList) {
+    public TipAdapter(List<Tip> tipList) {
         this.tipList = tipList;
     }
 

@@ -2,9 +2,6 @@ package com.example.y.routeplanner.gson;
 
 import java.util.List;
 
-/**
- * Created by yforyoung on 2018/3/21.
- */
 
 public class MyPath {
     private String collection_name;

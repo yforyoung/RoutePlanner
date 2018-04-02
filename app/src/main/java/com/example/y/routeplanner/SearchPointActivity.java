@@ -1,7 +1,6 @@
 package com.example.y.routeplanner;
 
 
-
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -66,7 +65,7 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
         mapView = findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
-        setToolBar("搜索地点",SearchPointActivity.this,SEARCH_POINT);
+        setToolBar("搜索地点", SearchPointActivity.this, SEARCH_POINT);
 
 
         if (aMap == null) {
@@ -127,8 +126,8 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                                 l = latLng;
                             final String longitude = String.valueOf(l.longitude).trim();
                             final String latitude = String.valueOf(l.latitude).trim();
-                            Log.i(TAG, "onClick: "+longitude);
-                            Log.i(TAG, "onClick: "+latitude);
+                            Log.i(TAG, "onClick: " + longitude);
+                            Log.i(TAG, "onClick: " + latitude);
 
                             SearchPointActivity.this.runOnUiThread(new Runnable() {
                                 @Override
@@ -235,7 +234,6 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
             default:
         }
     }
-
 
 
     private void showPoint() {

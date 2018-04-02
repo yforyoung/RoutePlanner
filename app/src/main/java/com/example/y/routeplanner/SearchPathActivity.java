@@ -4,11 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -27,9 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
-import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
+
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.help.Tip;
 import com.amap.api.services.route.BusPath;
@@ -47,7 +45,7 @@ import com.example.y.routeplanner.gson.MyRoute;
 import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.util.Test;
-import com.example.y.routeplanner.util.Util;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -66,8 +64,7 @@ import okhttp3.Response;
 import static android.content.ContentValues.TAG;
 
 
-
-public class SearchPathActivity extends BaseActivity implements View.OnClickListener, RouteSearch.OnRouteSearchListener, RouteAdapter.OnItemClickListener{
+public class SearchPathActivity extends BaseActivity implements View.OnClickListener, RouteSearch.OnRouteSearchListener, RouteAdapter.OnItemClickListener {
     private TextView begin, end;
     private ImageView repeat, searchButon;
     private Intent intent;
@@ -91,9 +88,8 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         setContentView(R.layout.layout_search_path);
         initView();
         aMLocation = Test.getInstance().aMapLocation;
-        cityCode=Test.getInstance().cityCode;
+        cityCode = Test.getInstance().cityCode;
         from = new LatLonPoint(aMLocation.getLatitude(), aMLocation.getLongitude());
-
 
 
         LinearLayoutManager manager = new LinearLayoutManager(SearchPathActivity.this);
@@ -111,7 +107,6 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         searchButon.setOnClickListener(this);
 
 
-
         intent = new Intent(SearchPathActivity.this, SearchTipActivity.class);
 
 
@@ -127,7 +122,6 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -136,24 +130,18 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                 if (resultCode == Activity.RESULT_OK) {
                     fromTip = data.getBundleExtra("tip").getParcelable("tip");
                     assert fromTip != null;
-                    if (fromTip.getPoiID() != null && fromTip.getPoint() != null) {    //判断是否是一个点
-                        from = fromTip.getPoint();
-                        begin.setText(fromTip.getName());
-                    } else {
-                        Toast.makeText(SearchPathActivity.this, "请选择一个合理的起点！", Toast.LENGTH_SHORT).show();
-                    }
+                    from = fromTip.getPoint();
+                    begin.setText(fromTip.getName());
+
                 }
                 break;
             case 3:
                 if (resultCode == Activity.RESULT_OK) {
                     endTip = data.getBundleExtra("tip").getParcelable("tip");
                     assert endTip != null;
-                    if (endTip.getPoint() != null && endTip.getPoiID() != null) {
-                        to = endTip.getPoint();
-                        end.setText(endTip.getName());
-                    } else {
-                        Toast.makeText(SearchPathActivity.this, "请选择一个合理的终点！", Toast.LENGTH_SHORT).show();
-                    }
+                    to = endTip.getPoint();
+                    end.setText(endTip.getName());
+
                 }
                 break;
             default:
@@ -232,6 +220,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                                         public void onFailure(Call call, IOException e) {
 
                                         }
+
                                         @Override
                                         public void onResponse(Call call, Response response) throws IOException {
                                             String s = response.body().string();
@@ -346,11 +335,10 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
     }
-    
 
-    
+
     private void initView() {
-        begin =findViewById(R.id.begin);
+        begin = findViewById(R.id.begin);
         end = findViewById(R.id.end);
         repeat = findViewById(R.id.repeat);
         searchButon = findViewById(R.id.search_button);

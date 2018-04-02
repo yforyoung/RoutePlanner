@@ -1,8 +1,6 @@
 package com.example.y.routeplanner.gson;
 
-/**
- * Created by yforyoung on 2018/3/23.
- */
+
 
 public class Result {
     private int result;
