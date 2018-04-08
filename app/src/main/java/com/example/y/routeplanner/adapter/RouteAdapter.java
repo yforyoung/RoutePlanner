@@ -15,9 +15,7 @@ import com.example.y.routeplanner.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by yforyoung on 2018/3/12.
- */
+
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> implements AdapterView.OnClickListener{
     private List<BusPath> busPathList=new ArrayList<>();

@@ -106,6 +106,7 @@ public class SearchBusLineActivity extends BaseActivity implements BusLineSearch
         if (requestCode==SEARCH_BUS_LINT){
             if (resultCode==RESULT_OK){
                 Tip tip=data.getBundleExtra("tip").getParcelable("tip");
+                assert tip != null;
                 searchBusLine(tip.getPoiID());
             }
         }

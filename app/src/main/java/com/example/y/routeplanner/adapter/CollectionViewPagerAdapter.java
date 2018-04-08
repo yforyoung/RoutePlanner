@@ -10,9 +10,7 @@ import com.example.y.routeplanner.fragment.CollectionPointFragment;
 import com.example.y.routeplanner.fragment.CollectionRouteFragment;
 
 
-/**
- * Created by yforyoung on 2018/3/17.
- */
+
 
 public class CollectionViewPagerAdapter extends FragmentPagerAdapter {
     private Fragment[] fragments=new Fragment[]{new CollectionRouteFragment(),new CollectionPointFragment()};

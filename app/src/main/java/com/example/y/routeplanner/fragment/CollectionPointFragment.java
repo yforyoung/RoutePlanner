@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -57,11 +58,8 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
             super.handleMessage(msg);
             switch (msg.what) {
                 case 1:
-                    break;
-                case 2:
                     adapter.notifyDataSetChanged();
                     break;
-
             }
         }
     };
@@ -108,7 +106,7 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                         .build();
                 client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
 
                     }
 
@@ -123,9 +121,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                             list.clear();
                             List<CollectionPoint> collectionPoints = (List<CollectionPoint>) responseData.getData();
                             list.addAll(collectionPoints);
-                            message.what = 2;
-                            handler.sendMessage(message);
-                        } else {
                             message.what = 1;
                             handler.sendMessage(message);
                         }
@@ -192,9 +187,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                         }.getType());
                         if (responseData.getCode() == 1) {
                             list.remove(position);
-                            message.what = 2;
-                            handler.sendMessage(message);
-                        } else {
                             message.what = 1;
                             handler.sendMessage(message);
                         }

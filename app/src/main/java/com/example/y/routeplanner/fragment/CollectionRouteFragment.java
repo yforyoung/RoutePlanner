@@ -31,7 +31,6 @@ import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
-import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -65,11 +64,8 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
             super.handleMessage(msg);
             switch (msg.what){
                 case 1:
-                    break;
-                case 2:
                     adapter.notifyDataSetChanged();
                     break;
-
             }
         }
     };
@@ -134,9 +130,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                             for (CollectionRoute cr : list){
                                 myPathList.add(cr.getRoute_information());
                             }
-                            message.what=2;
-                            handler.sendMessage(message);
-                        }else{
                             message.what=1;
                             handler.sendMessage(message);
                         }
@@ -248,9 +241,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                         }.getType());
                         if (responseData.getCode() == 1) {
                             myPathList.remove(position);
-                            message.what = 2;
-                            handler.sendMessage(message);
-                        } else {
                             message.what = 1;
                             handler.sendMessage(message);
                         }

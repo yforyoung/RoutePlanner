@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/setting"
+        android:title="设置"
+        android:icon="@drawable/ic_setting"
+        />
+    <item
+        android:id="@+id/city"
+        android:title="更换城市"
+        android:icon="@drawable/ic_city"
+        />
+    <item
+        android:id="@+id/log_out"
+        android:title="注销"
+        android:icon="@drawable/ic_log_out"
+        />
+    <item
+        android:id="@+id/exit"
+        android:title="退出"
+        android:icon="@drawable/ic_exit"/>
+
+</menu>

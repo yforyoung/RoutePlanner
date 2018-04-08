@@ -50,7 +50,7 @@ public class SetActivity extends BaseActivity implements View.OnClickListener{
         user=Test.getInstance().user;
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        Button logout = findViewById(R.id.logout);
+
         username=findViewById(R.id.username_change);
         gender=findViewById(R.id.gender_change);
         birthday=findViewById(R.id.birthday_change);
@@ -65,7 +65,7 @@ public class SetActivity extends BaseActivity implements View.OnClickListener{
         gender.setFocusable(false);
         birthday.setFocusable(false);
 
-        logout.setOnClickListener(this);
+
         toolbar.setNavigationIcon(R.drawable.back);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -95,14 +95,6 @@ public class SetActivity extends BaseActivity implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.logout:
-                SharedPreferences.Editor editor=getSharedPreferences("user",MODE_PRIVATE).edit();
-                editor.putInt("login",0);
-                editor.apply();
-                Test.getInstance().user=null;
-                Test.getInstance().loginOrNot=0;    //设置未登陆
-                finish();
-                break;
             case R.id.birthday_change:
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);

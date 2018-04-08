@@ -3,9 +3,7 @@ package com.example.y.routeplanner.util;
 import com.amap.api.location.AMapLocation;
 import com.example.y.routeplanner.gson.User;
 
-/**
- * Created by yforyoung on 2018/3/21.
- */
+
 
 public class Test {
     private Test(){}

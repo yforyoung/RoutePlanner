@@ -14,9 +14,7 @@ import com.example.y.routeplanner.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by yforyoung on 2018/3/10.
- */
+
 
 public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ViewHolder> implements AdapterView.OnClickListener{
 

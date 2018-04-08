@@ -83,6 +83,7 @@ public class SearchBusStepActivity extends BaseActivity implements BusStationSea
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode==SEARCH_BUS_STEP&&resultCode==RESULT_OK){
             Tip tip=data.getBundleExtra("tip").getParcelable("tip");
+            assert tip != null;
             searchBusStep(tip.getName());
         }
     }

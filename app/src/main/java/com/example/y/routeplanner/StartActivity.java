@@ -9,8 +9,13 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -32,10 +37,11 @@ import java.util.List;
 
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-public class StartActivity extends BaseActivity implements View.OnClickListener,AMapLocationListener {
-    private TextView name,tel,set;
+public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener,NavigationView.OnNavigationItemSelectedListener {
+    private TextView name, tel,cityShow;
     private Button load;
     private LinearLayout view;
+    private DrawerLayout drawerLayout;
     Intent intent;
 
     private String[] permissions = new String[]{
@@ -52,7 +58,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
-        intent=new Intent();
+        intent = new Intent();
 
         request();          //请求权限
         initView();         //初始化视图
@@ -74,27 +80,61 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     public void initView() {
-        load=findViewById(R.id.user_log);
-        name=findViewById(R.id.user_name);
-        tel=findViewById(R.id.user_tel);
-        ImageView profile = findViewById(R.id.user_profile);
-        view=findViewById(R.id.user_info_view);
-        LinearLayout searchLoaction = findViewById(R.id.search_location);
+        Toolbar toolbar = findViewById(R.id.toolbar_main);
+        toolbar.setTitle("");
+        cityShow=toolbar.findViewById(R.id.city_show);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_menu);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+        NavigationView navigationView = findViewById(R.id.navigation);
+        navigationView.setNavigationItemSelectedListener(this);
+        drawerLayout = findViewById(R.id.drawer_layout);
+
+
+
+
+        load = navigationView.getHeaderView(0).findViewById(R.id.user_log);
+        name = navigationView.getHeaderView(0).findViewById(R.id.user_name);
+        tel = navigationView.getHeaderView(0).findViewById(R.id.user_tel);
+        ImageView profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
+        view = navigationView.getHeaderView(0).findViewById(R.id.user_info_view);
+
+
+        LinearLayout searchLocation = findViewById(R.id.search_location);
         LinearLayout searchBusPath = findViewById(R.id.search_bus_path);
         LinearLayout collection = findViewById(R.id.collection);
-        LinearLayout searchBusLine=findViewById(R.id.search_bus_line);
-        LinearLayout searchBusStep=findViewById(R.id.search_bus_step);
-        set=findViewById(R.id.set);
+        LinearLayout searchBusLine = findViewById(R.id.search_bus_line);
+        LinearLayout searchBusStep = findViewById(R.id.search_bus_step);
+
+
+
         load.setOnClickListener(this);
         profile.setOnClickListener(this);
-        set.setOnClickListener(this);
-        searchLoaction.setOnClickListener(this);
+
+        searchLocation.setOnClickListener(this);
         searchBusPath.setOnClickListener(this);
         collection.setOnClickListener(this);
         searchBusLine.setOnClickListener(this);
         searchBusStep.setOnClickListener(this);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+
+            drawerLayout.closeDrawer(GravityCompat.START);
+
+        } else {
+
+            super.onBackPressed();
+
+        }
+    }
 
     public void request() {
         pList.clear();
@@ -108,6 +148,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             ActivityCompat.requestPermissions(StartActivity.this, permissions, 1);
         }
     }
+
 
 
     @Override
@@ -134,60 +175,54 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.user_log:
-                intent.setClass(this,LoadActivity.class);
+                intent.setClass(this, LoadActivity.class);
                 startActivity(intent);
                 finish();
-                break;
-            case R.id.set:
-                intent.setClass(this,SetActivity.class);
-                startActivity(intent);
                 break;
             case R.id.user_profile:
                 Toast.makeText(StartActivity.this, "click profile", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.search_bus_path:
-                intent.setClass(this,SearchPathActivity.class);
+                intent.setClass(this, SearchPathActivity.class);
                 startActivity(intent);
                 break;
             case R.id.search_location:
-                intent.setClass(this,SearchPointActivity.class);
+                intent.setClass(this, SearchPointActivity.class);
                 startActivity(intent);
                 break;
             case R.id.search_bus_line:
-                intent.setClass(this,SearchBusLineActivity.class);
+                intent.setClass(this, SearchBusLineActivity.class);
                 startActivity(intent);
                 break;
             case R.id.search_bus_step:
-                intent.setClass(this,SearchBusStepActivity.class);
+                intent.setClass(this, SearchBusStepActivity.class);
                 startActivity(intent);
                 break;
             case R.id.collection:
-                intent.setClass(this,CollectionActivity.class);
+                intent.setClass(this, CollectionActivity.class);
                 startActivity(intent);
                 break;
         }
     }
 
-    private void initUserInfo(){
-        if (Test.getInstance().loginOrNot==1){      //登陆
+    private void initUserInfo() {
+        if (Test.getInstance().loginOrNot == 1) {      //登陆
             User user = Test.getInstance().user;
             load.setVisibility(View.GONE);
             view.setVisibility(View.VISIBLE);
-            set.setVisibility(View.VISIBLE);
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
 
-        }else{
+        } else {
             view.setVisibility(View.GONE);
             load.setVisibility(View.VISIBLE);
-            set.setVisibility(View.GONE);
         }
     }
 
 
-    public void getLocation(){
+    public void getLocation() {
 
         AMapLocationClient locationClient = new AMapLocationClient(StartActivity.this);
         locationClient.setLocationListener(this);
@@ -205,8 +240,34 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         if (aMapLocation != null) {
             if (aMapLocation.getErrorCode() == 0) {
                 Test.getInstance().cityCode = aMapLocation.getCityCode();   //设置cityCode
-                Test.getInstance().aMapLocation=aMapLocation;
+                Test.getInstance().aMapLocation = aMapLocation;
+                cityShow.setText(aMapLocation.getCity());
             }
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.setting:
+                intent.setClass(this, SetActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.exit:
+                finish();
+                break;
+            case R.id.log_out:
+                SharedPreferences.Editor editor=getSharedPreferences("user",MODE_PRIVATE).edit();
+                editor.putInt("login",0);
+                editor.apply();
+                Test.getInstance().user=null;
+                Test.getInstance().loginOrNot=0;    //设置未登陆
+                finish();
+                break;
+            case R.id.city:
+                Toast.makeText(this, "更换城市", Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return true;
     }
 }

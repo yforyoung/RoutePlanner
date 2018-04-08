@@ -16,7 +16,7 @@
         <ImageView
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
-            android:background="#8690d9"
+            android:background="#ffffff"
             android:layout_width="35dp"
             android:layout_height="4dp"/>
         <LinearLayout
@@ -34,7 +34,7 @@
             <TextView
                 android:text="收藏"
                 android:textSize="13dp"
-                android:textColor="#8690d9"
+                android:textColor="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>

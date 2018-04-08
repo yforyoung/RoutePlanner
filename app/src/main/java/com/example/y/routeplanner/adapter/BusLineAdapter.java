@@ -8,9 +8,6 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.amap.api.services.busline.BusStationItem;
-import com.example.y.routeplanner.R;
-import com.example.y.routeplanner.gson.CollectionPoint;
-
 import java.util.List;
 
 

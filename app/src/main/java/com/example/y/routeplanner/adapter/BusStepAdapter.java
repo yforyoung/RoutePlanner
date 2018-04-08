@@ -8,15 +8,15 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import com.amap.api.services.busline.BusLineItem;
-import com.amap.api.services.busline.BusLineItem;
+
 import com.example.y.routeplanner.R;
 
 import java.util.List;
 
 
-public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHolder> implements AdapterView.OnClickListener,AdapterView.OnLongClickListener {
+public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHolder> implements AdapterView.OnClickListener, AdapterView.OnLongClickListener {
     private OnItemClickListener onItemClickListener = null;
-    private OnItemLongClickListener onItemLongClickListener=null;
+    private OnItemLongClickListener onItemLongClickListener = null;
 
     private List<BusLineItem> list;
 
@@ -27,7 +27,7 @@ public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHold
     @Override
     public BusStepAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bus_step, parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_bus_step, parent, false);
         BusStepAdapter.ViewHolder holder = new BusStepAdapter.ViewHolder(view);
         view.setOnClickListener(this);
         view.setOnLongClickListener(this);
@@ -36,9 +36,9 @@ public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(BusStepAdapter.ViewHolder holder, int position) {
-        String s=list.get(position).getBusLineName();
-        s=s.replaceFirst("\\(","\n");
-        s=s.substring(0,s.length()-1);
+        String s = list.get(position).getBusLineName();
+        s = s.replaceFirst("\\(", "\n");
+        s = s.substring(0, s.length() - 1);
 
         holder.name.setText(s.split("\n")[0]);
         holder.forward.setText(s.split("\n")[1]);
@@ -59,19 +59,19 @@ public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHold
 
     @Override
     public boolean onLongClick(View view) {
-        if (onItemLongClickListener!=null){
+        if (onItemLongClickListener != null) {
             onItemLongClickListener.onItemLongClick(view, (Integer) view.getTag());
         }
         return true;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name,forward;
+        TextView name, forward;
 
         ViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.line_name);
-            forward=itemView.findViewById(R.id.line_forward);
+            forward = itemView.findViewById(R.id.line_forward);
         }
     }
 
@@ -86,7 +86,8 @@ public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHold
     public interface OnItemClickListener {
         void onItemClick(View v, int position);
     }
-    public interface OnItemLongClickListener{
+
+    public interface OnItemLongClickListener {
         void onItemLongClick(View v, int position);
     }
 }

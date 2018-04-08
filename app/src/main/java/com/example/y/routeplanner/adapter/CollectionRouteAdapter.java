@@ -13,9 +13,6 @@ import com.example.y.routeplanner.gson.MyPath;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by yforyoung on 2018/3/21.
- */
 
 public class CollectionRouteAdapter extends RecyclerView.Adapter<CollectionRouteAdapter.ViewHolder> implements AdapterView.OnClickListener,View.OnLongClickListener{
     private OnItemClickListener onItemClickListener = null;

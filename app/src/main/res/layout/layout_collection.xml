@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:background="#e4e4e4"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <!--<include layout="@layout/toolbar"/>-->
 
     <LinearLayout
         android:orientation="vertical"
@@ -14,7 +13,8 @@
         android:background="@color/colorWhite"
         android:layout_gravity="left|bottom"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:ignore="RtlHardcoded">
 
 
         <android.support.design.widget.BottomNavigationView

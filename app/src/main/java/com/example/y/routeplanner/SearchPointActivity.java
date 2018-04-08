@@ -224,6 +224,7 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                 if (resultCode == Activity.RESULT_OK) {
                     //显示地图点
                     Tip tip = data.getBundleExtra("tip").getParcelable("tip");
+                    assert tip != null;
                     if (tip.getPoiID() != null && tip.getPoint() != null) {
                         latLng = new LatLng(tip.getPoint().getLatitude(), tip.getPoint().getLongitude());
                         aMap.addMarker(new MarkerOptions().position(latLng).title(tip.getName()));

@@ -41,7 +41,7 @@ public class BaseActivity extends AppCompatActivity {
                 case SHOW_TOAST:
                     String s=msg.getData().getString("toast");
                     Toast.makeText(getApplicationContext(),s, Toast.LENGTH_SHORT).show();
-                    Log.i(TAG, "handleMessage: ");
+
                     break;
             }
         }
@@ -90,6 +90,10 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
         linearLayout.addView(view);
+        showToolBar();
+
+    }
+    public void showToolBar(){
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);

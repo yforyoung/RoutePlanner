@@ -100,23 +100,6 @@
                     android:inputType="text" />
             </android.support.design.widget.TextInputLayout>
 
-
-            <Button
-                android:id="@+id/logout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="20dp"
-                android:background="#ff4a4a"
-                android:text="退出登录"
-                android:textColor="#fff" />
-            <!--    <fragment
-                    android:id="@+id/pref_content"
-                    android:layout_weight="10"
-                    android:layout_below="@id/t"
-                    android:layout_above="@id/logout"
-                    android:name="com.example.y.routeplanner.fragment.SettingFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>-->
         </LinearLayout>
 
 
