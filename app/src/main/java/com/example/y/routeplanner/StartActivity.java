@@ -1,11 +1,20 @@
 package com.example.y.routeplanner;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -35,13 +44,17 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener,NavigationView.OnNavigationItemSelectedListener {
+   private static final int OPEN_ALBUM=6;
     private TextView name, tel,cityShow;
     private Button load;
     private LinearLayout view;
     private DrawerLayout drawerLayout;
+    private CircleImageView profile;
     Intent intent;
 
     private String[] permissions = new String[]{
@@ -66,10 +79,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         SharedPreferences spf = getSharedPreferences("user", MODE_PRIVATE);
         if (spf.getInt("login", 0) == 1) {                       //获取本地用户信息,设置单例
             Test.getInstance().loginOrNot = 1;
-
             initUser();
         }
-
         initUserInfo();
         getLocation();
 
@@ -101,7 +112,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         load = navigationView.getHeaderView(0).findViewById(R.id.user_log);
         name = navigationView.getHeaderView(0).findViewById(R.id.user_name);
         tel = navigationView.getHeaderView(0).findViewById(R.id.user_tel);
-        ImageView profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
+         profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
         view = navigationView.getHeaderView(0).findViewById(R.id.user_info_view);
 
 
@@ -183,6 +194,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 break;
             case R.id.user_profile:
                 Toast.makeText(StartActivity.this, "click profile", Toast.LENGTH_SHORT).show();
+                openAlbum();
                 break;
             case R.id.search_bus_path:
                 intent.setClass(this, SearchPathActivity.class);
@@ -262,6 +274,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 editor.apply();
                 Test.getInstance().user=null;
                 Test.getInstance().loginOrNot=0;    //设置未登陆
+                Intent intent=new Intent(this,LoadActivity.class);
+                startActivity(intent);
                 finish();
                 break;
             case R.id.city:
@@ -269,5 +283,94 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 break;
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case OPEN_ALBUM:
+                if (resultCode==RESULT_OK){
+                    if (Build.VERSION.SDK_INT>=19){
+                        handleImageOnKitKat(data);
+                    }else
+                        handleImageBeforeKitKat(data);
+                }
+        }
+    }
+
+    private void handleImageBeforeKitKat(Intent data) {
+        Uri uri=data.getData();
+        String imagePath=getImagePath(uri,null);
+        setProfile(imagePath);
+    }
+
+    @TargetApi(19)
+    private void handleImageOnKitKat(Intent data) {
+        String imagePath=null;
+        Uri uri=data.getData();
+        if (DocumentsContract.isDocumentUri(this,uri)){
+            String docId=DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())){
+                String id=docId.split(":")[1];
+                String selection= MediaStore.Images.Media._ID+"="+id;
+                imagePath=getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
+            }else if("com.android..providers.downloads.documents".equals(uri.getAuthority())){
+                Uri contentUri= ContentUris.withAppendedId(Uri.parse("content://downloads//public_downloads"),Long.valueOf(docId));
+                imagePath=getImagePath(contentUri,null);
+            }
+        }else if("content".equalsIgnoreCase(uri.getScheme())){
+            imagePath=getImagePath(uri,null);
+        }else if ("file".equalsIgnoreCase(uri.getScheme())){
+            imagePath=uri.getPath();
+        }
+        if(picSaved(imagePath)){
+            setProfile(readPicPath());
+        }
+
+    }
+
+    private void setProfile(String imagePath) {
+        if (imagePath!=null){
+            Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
+            BitmapDrawable bd= new BitmapDrawable(bitmap);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                profile.setImageDrawable(bd);
+            }
+            //设置背景
+        }else {
+            Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public boolean picSaved(String picPath){
+        SharedPreferences.Editor editor=getSharedPreferences("picPath",MODE_PRIVATE).edit();
+        editor.putString("pic_path",picPath);
+        editor.apply();
+        return true;
+    }
+
+    public String readPicPath(){
+        SharedPreferences preferences=getSharedPreferences("picPath",MODE_PRIVATE);
+        return preferences.getString("pic_path","");
+    }
+
+
+    private String getImagePath(Uri uri, String selection) {
+        String path=null;
+        Cursor cursor=getContentResolver().query(uri,null,selection,null,null);
+        if (cursor!=null){
+            if (cursor.moveToFirst()) {
+                path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+            }
+            cursor.close();
+        }
+
+        return path;
+    }
+
+    private void openAlbum() {
+        Intent intent=new Intent("android.intent.action.GET_CONTENT");
+        intent.setType("image/*");
+        startActivityForResult(intent,OPEN_ALBUM);
     }
 }

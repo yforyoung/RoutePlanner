@@ -76,11 +76,15 @@ public class Util {
 
 
     public void login(AppCompatActivity context, User user) {
-
         SharedPreferences.Editor editor = context.getSharedPreferences("user", Context.MODE_PRIVATE).edit();
         editor.putInt("login", 1); //标志已登陆
         editor.apply();
-        save(new Gson().toJson(user), context);//村用户信息到本地
+        String gen=user.getGender();
+        if (gen.equals("1"))
+            user.setGender("男");
+        else if (gen.equals("0"))
+            user.setGender("女");
+        save(new Gson().toJson(user), context);//存用户信息到本地
         Intent intent = new Intent(context, StartActivity.class);
         context.startActivity(intent);
         context.finish();
