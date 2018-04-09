@@ -237,7 +237,7 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                         String s = response.body().string();
                         Log.i(TAG, "onResponse:删除路线 " + s);
                         Message message = new Message();
-                        ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<Result>>() {
+                        ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<String>>() {
                         }.getType());
                         if (responseData.getCode() == 1) {
                             myPathList.remove(position);

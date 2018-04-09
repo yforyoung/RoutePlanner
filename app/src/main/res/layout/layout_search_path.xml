@@ -7,11 +7,14 @@
 
     <include
         layout="@layout/toolbar_search_path"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/route_list"
         android:background="#fff"
-        android:layout_marginTop="10dp"
         android:layout_marginHorizontal="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

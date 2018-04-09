@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/search_bolder"
-    android:layout_margin="10dp"
+    android:layout_marginHorizontal="10dp"
     android:gravity="center"
     android:orientation="horizontal"
     android:padding="5dp">
@@ -45,7 +45,7 @@
         android:layout_width="0.5dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:background="@color/colorSearch" />
+        android:background="#ff8c8c8c" />
 
     <ImageView
         android:id="@+id/search_button"
@@ -54,6 +54,7 @@
         android:layout_gravity="center"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
-        android:src="@drawable/ic_search" />
+        android:src="@drawable/ic_search_black" />
+
 
 </LinearLayout>

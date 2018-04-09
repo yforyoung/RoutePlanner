@@ -18,6 +18,14 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 import static android.content.ContentValues.TAG;
 
 
@@ -97,6 +105,31 @@ public class BaseActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+    }
+
+    public void doPost(final Request request){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String s=response.body().string();
+                        handleResponse(s);
+                    }
+                });
+            }
+        });
+    }
+
+    public void handleResponse(String response){
+        Log.i(TAG, "handleResponse: "+response);
     }
 
 }

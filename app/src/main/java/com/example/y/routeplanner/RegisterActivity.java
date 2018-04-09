@@ -55,45 +55,34 @@ public class RegisterActivity extends BaseActivity {
                 }else if (!sPasswd.equals(sConfirm)){
                     Toast.makeText(RegisterActivity.this, "密码不一致！请确认密码", Toast.LENGTH_SHORT).show();
                 }else{
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            OkHttpClient client=new OkHttpClient();
-                            RequestBody requestBody=new FormBody.Builder()
-                                    .add("username",sName)
-                                    .add("telphone",sTel)
-                                    .add("password",sPasswd)
-                                    .build();
-                            Request request=new Request.Builder()
-                                    .url("http://120.77.170.124:8080/busis/user/register.do")
-                                    .post(requestBody)
-                                    .build();
-                            client.newCall(request).enqueue(new Callback() {
-                                @Override
-                                public void onFailure(Call call, IOException e) {
 
-                                }
+                    RequestBody requestBody=new FormBody.Builder()
+                            .add("username",sName)
+                            .add("telphone",sTel)
+                            .add("password",sPasswd)
+                            .build();
+                    Request request=new Request.Builder()
+                            .url("http://120.77.170.124:8080/busis/user/register.do")
+                            .post(requestBody)
+                            .build();
 
-                                @Override
-                                public void onResponse(Call call, Response response) throws IOException {
-                                    String json = response.body().string();
-                                    ResponseData responseData=new Gson().fromJson(json,new TypeToken<ResponseData<User>>(){}.getType());
-                                    Log.i(TAG, "login: "+json);
-                                    if (responseData.getCode()==1) {
-                                        User user = (User) responseData.getData();
-                                        new Util().login(RegisterActivity.this,user);
-                                    }else {
-                                        sendMessage(responseData.getMessage());
-                                    }
-                                }
-                            });
-                        }
-                    });
+                    doPost(request);
                 }
             }
         });
 
     }
 
-
+    @Override
+    public void handleResponse(String response) {
+        super.handleResponse(response);
+        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
+        Log.i(TAG, "login: "+response);
+        if (responseData.getCode()==1) {
+            User user = (User) responseData.getData();
+            new Util().login(RegisterActivity.this,user);
+        }else {
+            sendMessage(responseData.getMessage());
+        }
+    }
 }

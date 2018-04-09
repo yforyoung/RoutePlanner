@@ -60,44 +60,33 @@ public class LoadActivity extends BaseActivity {
                 password = passwordInput.getText().toString();
                 Log.i(TAG, "onClick: "+tel+"    "+password);
                 if (!tel .equals("") && !password.equals("")) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //登陆
-                            OkHttpClient client = new OkHttpClient();
-                            RequestBody requestBody = new FormBody.Builder()
-                                    .add("account", tel)
-                                    .add("password", password)
-                                    .build();
-                            Request request = new Request.Builder()
-                                    .url("http://120.77.170.124:8080/busis/user/login.do")
-                                    .post(requestBody)
-                                    .build();
-                            client.newCall(request).enqueue(new Callback() {
-                                @Override
-                                public void onFailure(Call call, IOException e) {
 
-                                }
-
-                                @Override
-                                public void onResponse(Call call, Response response) throws IOException {
-                                    String json = response.body().string();
-                                    ResponseData responseData=new Gson().fromJson(json,new TypeToken<ResponseData<User>>(){}.getType());
-                                    Log.i(TAG, "login: "+json);
-                                    if (responseData.getCode()==1) {
-                                        User user = (User) responseData.getData();
-                                        new Util().login(LoadActivity.this,user);
-                                    }else {
-                                        sendMessage("用户名或密码错误！");
-                                    }
-                                }
-                            });
-                        }
-                    });
+                    RequestBody requestBody = new FormBody.Builder()
+                            .add("account", tel)
+                            .add("password", password)
+                            .build();
+                    Request request = new Request.Builder()
+                            .url("http://120.77.170.124:8080/busis/user/login.do")
+                            .post(requestBody)
+                            .build();
+                    doPost(request);
                 }else{
                     Toast.makeText(LoadActivity.this, "请输入登陆信息！", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+    }
+
+    @Override
+    public void handleResponse(String response) {
+        super.handleResponse(response);
+        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
+        Log.i(TAG, "login: "+response);
+        if (responseData.getCode()==1) {
+            User user = (User) responseData.getData();
+            new Util().login(LoadActivity.this,user);
+        }else {
+            sendMessage("用户名或密码错误！");
+        }
     }
 }

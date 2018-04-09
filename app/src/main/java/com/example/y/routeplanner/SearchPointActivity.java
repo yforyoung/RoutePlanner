@@ -126,47 +126,32 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                                 l = latLng;
                             final String longitude = String.valueOf(l.longitude).trim();
                             final String latitude = String.valueOf(l.latitude).trim();
-                            Log.i(TAG, "onClick: " + longitude);
-                            Log.i(TAG, "onClick: " + latitude);
 
-                            SearchPointActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    OkHttpClient client = new OkHttpClient();
-                                    RequestBody requestBody = new FormBody.Builder()
-                                            .add("location_name", input)
-                                            .add("location_longitude", longitude)
-                                            .add("location_latitude", latitude)
-                                            .add("user_id", Test.getInstance().user.getUserId())
-                                            .build();
-                                    Request request = new Request.Builder()
-                                            .url("http://120.77.170.124:8080/busis/location/add.do")
-                                            .post(requestBody)
-                                            .build();
-                                    client.newCall(request).enqueue(new Callback() {
-                                        @Override
-                                        public void onFailure(Call call, IOException e) {
-
-                                        }
-
-                                        @Override
-                                        public void onResponse(Call call, Response response) throws IOException {
-                                            String s = response.body().string();
-                                            Log.i(TAG, "onResponse:   " + s);
-                                            ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<Result>>() {
-                                            }.getType());
-                                            sendMessage(responseData.getMessage());
-                                        }
-                                    });
-
-                                }
-                            });
+                            RequestBody requestBody = new FormBody.Builder()
+                                    .add("location_name", input)
+                                    .add("location_longitude", longitude)
+                                    .add("location_latitude", latitude)
+                                    .add("user_id", Test.getInstance().user.getUserId())
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url("http://120.77.170.124:8080/busis/location/add.do")
+                                    .post(requestBody)
+                                    .build();
+                            doPost(request);
                         }
                     }
                 })
                 .setNegativeButton("取消", null)
                 .show();
+    }
 
+    @Override
+    public void handleResponse(String response) {
+        super.handleResponse(response);
+        Log.i(TAG, "onResponse:   " + response);
+        ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
+        }.getType());
+        sendMessage(responseData.getMessage());
     }
 
     @Override

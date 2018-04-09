@@ -199,45 +199,33 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                             Gson gson = new Gson();
                             final String data = gson.toJson(myPath);
 
-                            SearchPathActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    OkHttpClient client = new OkHttpClient();
-                                    RequestBody requestBody = new FormBody.Builder()
-                                            .add("start_longitude", from.getLongitude() + "")
-                                            .add("start_latitude", from.getLatitude() + "")
-                                            .add("end_longitude", to.getLongitude() + "")
-                                            .add("end_latitude", to.getLatitude() + "")
-                                            .add("user_id", Test.getInstance().user.getUserId() + "")
-                                            .add("route_information", data)
-                                            .build();
-                                    Request request = new Request.Builder()
-                                            .url("http://120.77.170.124:8080/busis/collection/add.do")
-                                            .post(requestBody)
-                                            .build();
-                                    client.newCall(request).enqueue(new Callback() {
-                                        @Override
-                                        public void onFailure(Call call, IOException e) {
-
-                                        }
-
-                                        @Override
-                                        public void onResponse(Call call, Response response) throws IOException {
-                                            String s = response.body().string();
-                                            ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<Result>>() {
-                                            }.getType());
-                                            sendMessage(responseData.getMessage());
-
-                                        }
-                                    });
-                                }
-                            });
+                            RequestBody requestBody = new FormBody.Builder()
+                                    .add("start_longitude", from.getLongitude() + "")
+                                    .add("start_latitude", from.getLatitude() + "")
+                                    .add("end_longitude", to.getLongitude() + "")
+                                    .add("end_latitude", to.getLatitude() + "")
+                                    .add("user_id", Test.getInstance().user.getUserId() + "")
+                                    .add("route_information", data)
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url("http://120.77.170.124:8080/busis/collection/add.do")
+                                    .post(requestBody)
+                                    .build();
+                            doPost(request);
                         }
                     }
                 })
                 .setNegativeButton("取消", null)
                 .show();
     }   //收藏路线
+
+    @Override
+    public void handleResponse(String response) {
+        super.handleResponse(response);
+        ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
+        }.getType());
+        sendMessage(responseData.getMessage());
+    }
 
     @Override
     public void onBusRouteSearched(BusRouteResult busRouteResult, int i) {

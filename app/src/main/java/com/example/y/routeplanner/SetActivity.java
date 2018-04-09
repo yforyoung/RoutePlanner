@@ -45,6 +45,9 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
     private EditText username,telephone,introduce;
     private TextView gender,birthday;
     private User user;
+    private String textUserName,textGender,textBirthday,textTel,textIntro;
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,58 +140,52 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
         }else{
             b=0;
         }
-
         final  String c=birthday.getText().toString();
         final  String d=introduce.getText().toString();
         final String e=telephone.getText().toString();
 
+        textUserName=a;
+        textTel=e;
+        textBirthday=c;
+        textGender=gen;
+        textIntro=d;
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("user_id", userId)
-                        .add("username", a)
-                        .add("gender",String.valueOf(b))
-                        .add("birthday",c)
-                        .add("introduce",d)
-                        .add("telphone",e)
-                        .build();
-                Request request = new Request.Builder()
-                        .url("http://120.77.170.124:8080/busis/user/modify.do")
-                        .post(requestBody)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        Log.e(TAG, "onFailure: ", e);
-                    }
+        RequestBody requestBody = new FormBody.Builder()
+                .add("user_id", userId)
+                .add("username", a)
+                .add("gender",String.valueOf(b))
+                .add("birthday",c)
+                .add("introduce",d)
+                .add("telphone",e)
+                .build();
+        Request request = new Request.Builder()
+                .url("http://120.77.170.124:8080/busis/user/modify.do")
+                .post(requestBody)
+                .build();
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String userJson = response.body().string();
-                        Util util=new Util();
-                        Log.i(TAG, "onResponse: "+userJson);
-                        ResponseData responseData=new Gson().fromJson(userJson,new TypeToken<ResponseData<String>>(){}.getType());
-                        if (responseData.getCode()==1){
-                            user.setUserName(a);
-                            user.setGender(gen);
-                            user.setBirthday(c);
-                            user.setIntroduce(d);
-                            user.setTelphone(e);
-                            Test.getInstance().user=user;       //修改用户信息
-                            util.save(new Gson().toJson(user),getApplicationContext());        //覆盖本地用户信息
-                            sendMessage("修改成功！");
-                        }else{
-                            sendMessage(responseData.getMessage());
-                        }
-                        finish();
-                    }
-                });
+        doPost(request);
+    }
 
-            }
-        });
+    @Override
+    public void handleResponse(String response) {
+        super.handleResponse(response);
+
+        Util util=new Util();
+        Log.i(TAG, "onResponse: "+response);
+        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<String>>(){}.getType());
+        if (responseData.getCode()==1){
+            user.setUserName(textUserName);
+            user.setGender(textGender);
+            user.setBirthday(textBirthday);
+            user.setIntroduce(textIntro);
+            user.setTelphone(textTel);
+            Test.getInstance().user=user;       //修改用户信息
+            util.save(new Gson().toJson(user),getApplicationContext());        //覆盖本地用户信息
+            sendMessage("修改成功！");
+        }else{
+            sendMessage(responseData.getMessage());
+        }
+        finish();
 
     }
 

@@ -24,6 +24,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -41,16 +42,26 @@ import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener,NavigationView.OnNavigationItemSelectedListener {
-   private static final int OPEN_ALBUM=6;
-    private TextView name, tel,cityShow;
+public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener, NavigationView.OnNavigationItemSelectedListener {
+    private static final int OPEN_ALBUM = 6;
+    private TextView name, tel, cityShow;
     private Button load;
     private LinearLayout view;
     private DrawerLayout drawerLayout;
@@ -93,7 +104,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     public void initView() {
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         toolbar.setTitle("");
-        cityShow=toolbar.findViewById(R.id.city_show);
+        cityShow = toolbar.findViewById(R.id.city_show);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_menu);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -107,12 +118,10 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         drawerLayout = findViewById(R.id.drawer_layout);
 
 
-
-
         load = navigationView.getHeaderView(0).findViewById(R.id.user_log);
         name = navigationView.getHeaderView(0).findViewById(R.id.user_name);
         tel = navigationView.getHeaderView(0).findViewById(R.id.user_tel);
-         profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
+        profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
         view = navigationView.getHeaderView(0).findViewById(R.id.user_info_view);
 
 
@@ -123,7 +132,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         LinearLayout searchBusStep = findViewById(R.id.search_bus_step);
 
 
-
         load.setOnClickListener(this);
         profile.setOnClickListener(this);
 
@@ -132,6 +140,21 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         collection.setOnClickListener(this);
         searchBusLine.setOnClickListener(this);
         searchBusStep.setOnClickListener(this);
+
+
+    }
+
+    private void loadProfile() {            //加载网络图片
+        String profilePath=Test.getInstance().user.getHeadPortrail();
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client=new OkHttpClient();
+
+
+            }
+        });
     }
 
     @Override
@@ -159,7 +182,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             ActivityCompat.requestPermissions(StartActivity.this, permissions, 1);
         }
     }
-
 
 
     @Override
@@ -226,6 +248,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             view.setVisibility(View.VISIBLE);
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
+            if (!readPicPath().equals("")) {
+                setProfile(readPicPath());
+            }
 
         } else {
             view.setVisibility(View.GONE);
@@ -260,7 +285,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.setting:
                 intent.setClass(this, SetActivity.class);
                 startActivity(intent);
@@ -269,12 +294,12 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 finish();
                 break;
             case R.id.log_out:
-                SharedPreferences.Editor editor=getSharedPreferences("user",MODE_PRIVATE).edit();
-                editor.putInt("login",0);
+                SharedPreferences.Editor editor = getSharedPreferences("user", MODE_PRIVATE).edit();
+                editor.putInt("login", 0);
                 editor.apply();
-                Test.getInstance().user=null;
-                Test.getInstance().loginOrNot=0;    //设置未登陆
-                Intent intent=new Intent(this,LoadActivity.class);
+                Test.getInstance().user = null;
+                Test.getInstance().loginOrNot = 0;    //设置未登陆
+                Intent intent = new Intent(this, LoadActivity.class);
                 startActivity(intent);
                 finish();
                 break;
@@ -287,90 +312,109 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case OPEN_ALBUM:
-                if (resultCode==RESULT_OK){
-                    if (Build.VERSION.SDK_INT>=19){
+                if (resultCode == RESULT_OK) {
+                    if (Build.VERSION.SDK_INT >= 19) {
                         handleImageOnKitKat(data);
-                    }else
+                    } else
                         handleImageBeforeKitKat(data);
                 }
         }
     }
 
+
     private void handleImageBeforeKitKat(Intent data) {
-        Uri uri=data.getData();
-        String imagePath=getImagePath(uri,null);
+        Uri uri = data.getData();
+        String imagePath = getImagePath(uri, null);
         setProfile(imagePath);
     }
 
     @TargetApi(19)
     private void handleImageOnKitKat(Intent data) {
-        String imagePath=null;
-        Uri uri=data.getData();
-        if (DocumentsContract.isDocumentUri(this,uri)){
-            String docId=DocumentsContract.getDocumentId(uri);
-            if ("com.android.providers.media.documents".equals(uri.getAuthority())){
-                String id=docId.split(":")[1];
-                String selection= MediaStore.Images.Media._ID+"="+id;
-                imagePath=getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,selection);
-            }else if("com.android..providers.downloads.documents".equals(uri.getAuthority())){
-                Uri contentUri= ContentUris.withAppendedId(Uri.parse("content://downloads//public_downloads"),Long.valueOf(docId));
-                imagePath=getImagePath(contentUri,null);
+        String imagePath = null;
+        Uri uri = data.getData();
+        if (DocumentsContract.isDocumentUri(this, uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+                String id = docId.split(":")[1];
+                String selection = MediaStore.Images.Media._ID + "=" + id;
+                imagePath = getImagePath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
+            } else if ("com.android..providers.downloads.documents".equals(uri.getAuthority())) {
+                Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads//public_downloads"), Long.valueOf(docId));
+                imagePath = getImagePath(contentUri, null);
             }
-        }else if("content".equalsIgnoreCase(uri.getScheme())){
-            imagePath=getImagePath(uri,null);
-        }else if ("file".equalsIgnoreCase(uri.getScheme())){
-            imagePath=uri.getPath();
+        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = getImagePath(uri, null);
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            imagePath = uri.getPath();
         }
-        if(picSaved(imagePath)){
+        if (picSaved(imagePath)) {
             setProfile(readPicPath());
         }
 
+
     }
 
-    private void setProfile(String imagePath) {
-        if (imagePath!=null){
-            Bitmap bitmap= BitmapFactory.decodeFile(imagePath);
-            BitmapDrawable bd= new BitmapDrawable(bitmap);
+    private void setProfile(final String imagePath) {
+        if (imagePath != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            final BitmapDrawable bd = new BitmapDrawable(bitmap);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 profile.setImageDrawable(bd);
             }
             //设置背景
-        }else {
+        } else {
             Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public boolean picSaved(String picPath){
-        SharedPreferences.Editor editor=getSharedPreferences("picPath",MODE_PRIVATE).edit();
-        editor.putString("pic_path",picPath);
-        editor.apply();
+
+    public void saveToServer(String imagePath) {
+        RequestBody requestBody = new MultipartBody.Builder()
+                .addFormDataPart("head_portrail", imagePath, RequestBody.create(MediaType.parse("image/jepg"), new File(imagePath)))
+                .addFormDataPart("user_id", Test.getInstance().user.getUserId()).build();
+
+        Request request = new Request.Builder()
+                .url("http://120.77.170.124:8080/busis/user/modify/head_portrail.do")
+                .post(requestBody)
+                .build();
+
+        doPost(request);
+
+    }
+
+    public boolean picSaved(final String picPath) {
+        SharedPreferences.Editor editor = getSharedPreferences("picPath", MODE_PRIVATE).edit();
+        editor.putString("pic_path", picPath);
+        editor.apply();     //存本地
+
+        //存网络
+        saveToServer(picPath);
         return true;
     }
 
-    public String readPicPath(){
-        SharedPreferences preferences=getSharedPreferences("picPath",MODE_PRIVATE);
-        return preferences.getString("pic_path","");
+    public String readPicPath() {
+        SharedPreferences preferences = getSharedPreferences("picPath", MODE_PRIVATE);
+        return preferences.getString("pic_path", "");
     }
 
 
     private String getImagePath(Uri uri, String selection) {
-        String path=null;
-        Cursor cursor=getContentResolver().query(uri,null,selection,null,null);
-        if (cursor!=null){
+        String path = null;
+        Cursor cursor = getContentResolver().query(uri, null, selection, null, null);
+        if (cursor != null) {
             if (cursor.moveToFirst()) {
                 path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
             }
             cursor.close();
         }
-
         return path;
     }
 
     private void openAlbum() {
-        Intent intent=new Intent("android.intent.action.GET_CONTENT");
+        Intent intent = new Intent("android.intent.action.GET_CONTENT");
         intent.setType("image/*");
-        startActivityForResult(intent,OPEN_ALBUM);
+        startActivityForResult(intent, OPEN_ALBUM);
     }
 }
