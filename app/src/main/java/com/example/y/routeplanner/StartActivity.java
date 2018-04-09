@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -37,10 +38,13 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.example.y.routeplanner.adapter.RollPagerAdapter;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
+import com.jude.rollviewpager.RollPagerView;
+import com.jude.rollviewpager.hintview.ColorPointHintView;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +70,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     private LinearLayout view;
     private DrawerLayout drawerLayout;
     private CircleImageView profile;
+    private RollPagerView rollPagerView;
     Intent intent;
 
     private String[] permissions = new String[]{
@@ -117,6 +122,11 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
 
+        rollPagerView=findViewById(R.id.roll_view_pager);
+        rollPagerView.setPlayDelay(5000);
+        rollPagerView.setHintView(new ColorPointHintView(this, Color.parseColor("#ff228c8a"),Color.WHITE));
+        rollPagerView.setAdapter(new RollPagerAdapter());
+
 
         load = navigationView.getHeaderView(0).findViewById(R.id.user_log);
         name = navigationView.getHeaderView(0).findViewById(R.id.user_name);
@@ -147,14 +157,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     private void loadProfile() {            //加载网络图片
         String profilePath=Test.getInstance().user.getHeadPortrail();
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpClient client=new OkHttpClient();
-
-
-            }
-        });
     }
 
     @Override

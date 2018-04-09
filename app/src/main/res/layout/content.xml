@@ -6,10 +6,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageView
+    <com.jude.rollviewpager.RollPagerView
+        android:id="@+id/roll_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="170dp"
-        android:background="#359364" />
+        android:layout_height="160dp">
+
+    </com.jude.rollviewpager.RollPagerView>
 
     <TableLayout
         android:layout_width="match_parent"
