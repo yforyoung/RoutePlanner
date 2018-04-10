@@ -30,6 +30,7 @@ import com.example.y.routeplanner.gson.CollectionPoint;
 import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
+import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -95,43 +96,34 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
 
     private void refresh() {
 
-        getActivity().runOnUiThread(new Runnable() {
+
+        RequestBody requestBody = new FormBody.Builder()
+                .add("user_id", user.getUserId() + "")
+                .build();
+        Request request = new Request.Builder()
+                .url("http://120.77.170.124:8080/busis/location/query.do")
+                .post(requestBody)
+                .build();
+
+        Util util=new Util();
+        util.setHandleResponse(new Util.handleResponse() {
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("user_id", user.getUserId() + "")
-                        .build();
-                Request request = new Request.Builder()
-                        .url("http://120.77.170.124:8080/busis/location/query.do")
-                        .post(requestBody)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String s = response.body().string();
-                        Log.i(TAG, "onResponse:收藏点 " + s);
-                        Message message = new Message();
-                        ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<List<CollectionPoint>>>() {
-                        }.getType());
-                        if (responseData.getCode() == 1) {
-                            list.clear();
-                            List<CollectionPoint> collectionPoints = (List<CollectionPoint>) responseData.getData();
-                            list.addAll(collectionPoints);
-                            message.what = 1;
-                            handler.sendMessage(message);
-                        }
-
-                    }
-                });
+            public void handleResponses(String response) {
+                Log.i(TAG, "onResponse:收藏点 " + response);
+                Message message = new Message();
+                ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionPoint>>>() {
+                }.getType());
+                if (responseData.getCode() == 1) {
+                    list.clear();
+                    List<CollectionPoint> collectionPoints = (List<CollectionPoint>) responseData.getData();
+                    list.addAll(collectionPoints);
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
             }
         });
 
+        util.doPost((AppCompatActivity)getActivity(),request);
     }
 
     @Override

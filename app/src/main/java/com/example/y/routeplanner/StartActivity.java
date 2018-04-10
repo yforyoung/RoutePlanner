@@ -25,11 +25,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,6 +39,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.bumptech.glide.Glide;
 import com.example.y.routeplanner.adapter.RollPagerAdapter;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
@@ -47,15 +49,19 @@ import com.jude.rollviewpager.RollPagerView;
 import com.jude.rollviewpager.hintview.ColorPointHintView;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Call;
-import okhttp3.Callback;
+
+
+import okhttp3.FormBody;
+import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -156,6 +162,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     private void loadProfile() {            //加载网络图片
         String profilePath=Test.getInstance().user.getHeadPortrail();
+        Glide.with(this).load(profilePath)
+               // .error(R.drawable.load_error)
+                .into(profile);
 
     }
 
@@ -251,7 +260,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
             if (!readPicPath().equals("")) {
-                setProfile(readPicPath());
+                loadProfile();
+              // setProfile(readPicPath());
             }
 
         } else {
@@ -329,7 +339,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     private void handleImageBeforeKitKat(Intent data) {
         Uri uri = data.getData();
         String imagePath = getImagePath(uri, null);
-        setProfile(imagePath);
+        if (picSaved(imagePath)) {
+            loadProfile();
+        }
     }
 
     @TargetApi(19)
@@ -338,6 +350,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         Uri uri = data.getData();
         if (DocumentsContract.isDocumentUri(this, uri)) {
             String docId = DocumentsContract.getDocumentId(uri);
+            assert uri != null;
             if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
                 String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
@@ -346,13 +359,16 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads//public_downloads"), Long.valueOf(docId));
                 imagePath = getImagePath(contentUri, null);
             }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            imagePath = getImagePath(uri, null);
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            imagePath = uri.getPath();
+        } else {
+            assert uri != null;
+            if ("content".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = getImagePath(uri, null);
+            } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+                imagePath = uri.getPath();
+            }
         }
         if (picSaved(imagePath)) {
-            setProfile(readPicPath());
+            loadProfile();
         }
 
 
@@ -373,16 +389,30 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
 
     public void saveToServer(String imagePath) {
+
         RequestBody requestBody = new MultipartBody.Builder()
-                .addFormDataPart("head_portrail", imagePath, RequestBody.create(MediaType.parse("image/jepg"), new File(imagePath)))
-                .addFormDataPart("user_id", Test.getInstance().user.getUserId()).build();
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("head_portrail", imagePath,RequestBody.create(MediaType.parse("image/*"),new File(imagePath)))
+                .addFormDataPart("user_id", Test.getInstance().user.getUserId())
+                .build();
 
         Request request = new Request.Builder()
-                .url("http://120.77.170.124:8080/busis/user/modify/head_portrail.do")
+                .url("http://192.168.31.214:81/test/test.php")
                 .post(requestBody)
                 .build();
 
-        doPost(request);
+        util.setHandleResponse(new Util.handleResponse() {
+            @Override
+            public void handleResponses(String response) {
+
+                User user=Test.getInstance().user;
+                user.setHeadPortrail(response);
+                Gson gson=new Gson();
+                String data=gson.toJson(user);
+                util.save(data,getApplicationContext());
+            }
+        });
+        util.doPost(StartActivity.this,request);
 
     }
 
@@ -390,7 +420,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         SharedPreferences.Editor editor = getSharedPreferences("picPath", MODE_PRIVATE).edit();
         editor.putString("pic_path", picPath);
         editor.apply();     //存本地
-
         //存网络
         saveToServer(picPath);
         return true;

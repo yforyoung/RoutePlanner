@@ -19,21 +19,17 @@ import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
+
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 import static android.content.ContentValues.TAG;
 
 
 
-public class LoadActivity extends BaseActivity {
+public class LoadActivity extends BaseActivity{
     private EditText telInput, passwordInput;
     private String tel = "", password = "";
 
@@ -69,24 +65,25 @@ public class LoadActivity extends BaseActivity {
                             .url("http://120.77.170.124:8080/busis/user/login.do")
                             .post(requestBody)
                             .build();
-                    doPost(request);
+                    Util util=new Util();
+                    util.setHandleResponse(new Util.handleResponse() {
+                        @Override
+                        public void handleResponses(String response) {
+                            ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
+                            Log.i(TAG, "login: "+response);
+                            if (responseData.getCode()==1) {
+                                User user = (User) responseData.getData();
+                                new Util().login(LoadActivity.this,user);
+                            }else {
+                                sendMessage("用户名或密码错误！");
+                            }
+                        }
+                    });
+                    util.doPost(LoadActivity.this,request);
                 }else{
                     Toast.makeText(LoadActivity.this, "请输入登陆信息！", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-    }
-
-    @Override
-    public void handleResponse(String response) {
-        super.handleResponse(response);
-        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
-        Log.i(TAG, "login: "+response);
-        if (responseData.getCode()==1) {
-            User user = (User) responseData.getData();
-            new Util().login(LoadActivity.this,user);
-        }else {
-            sendMessage("用户名或密码错误！");
-        }
     }
 }

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -15,30 +15,30 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
+
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 
 import com.example.y.routeplanner.gson.ResponseData;
-import com.example.y.routeplanner.gson.Result;
+
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
+
 import java.util.Calendar;
 
-import okhttp3.Call;
-import okhttp3.Callback;
+
+
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
+
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 public class SetActivity extends BaseActivity implements View.OnClickListener,View.OnFocusChangeListener{
     private static final String TAG ="setting" ;
@@ -162,32 +162,31 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
                 .url("http://120.77.170.124:8080/busis/user/modify.do")
                 .post(requestBody)
                 .build();
+        final Util util=new Util();
+        util.setHandleResponse(new Util.handleResponse() {
+            @Override
+            public void handleResponses(String response) {
+                Log.i(TAG, "onResponse: "+response);
+                ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<String>>(){}.getType());
+                if (responseData.getCode()==1){
+                    user.setUserName(textUserName);
+                    user.setGender(textGender);
+                    user.setBirthday(textBirthday);
+                    user.setIntroduce(textIntro);
+                    user.setTelphone(textTel);
+                    Test.getInstance().user=user;       //修改用户信息
+                    util.save(new Gson().toJson(user),getApplicationContext());        //覆盖本地用户信息
+                    sendMessage("修改成功！");
+                }else{
+                    sendMessage(responseData.getMessage());
+                }
+                finish();
+            }
+        });
 
-        doPost(request);
+        util.doPost(SetActivity.this,request);
     }
 
-    @Override
-    public void handleResponse(String response) {
-        super.handleResponse(response);
-
-        Util util=new Util();
-        Log.i(TAG, "onResponse: "+response);
-        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<String>>(){}.getType());
-        if (responseData.getCode()==1){
-            user.setUserName(textUserName);
-            user.setGender(textGender);
-            user.setBirthday(textBirthday);
-            user.setIntroduce(textIntro);
-            user.setTelphone(textTel);
-            Test.getInstance().user=user;       //修改用户信息
-            util.save(new Gson().toJson(user),getApplicationContext());        //覆盖本地用户信息
-            sendMessage("修改成功！");
-        }else{
-            sendMessage(responseData.getMessage());
-        }
-        finish();
-
-    }
 
     @Override
     public void onFocusChange(View view, boolean b) {
@@ -230,6 +229,7 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
 
     public void hideInput(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 }

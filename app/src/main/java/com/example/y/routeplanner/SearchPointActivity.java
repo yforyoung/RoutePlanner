@@ -34,18 +34,15 @@ import com.amap.api.services.help.Tip;
 import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.util.Test;
+import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
+
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 import static android.content.ContentValues.TAG;
 
@@ -137,7 +134,17 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                                     .url("http://120.77.170.124:8080/busis/location/add.do")
                                     .post(requestBody)
                                     .build();
-                            doPost(request);
+                            Util util=new Util();
+                            util.setHandleResponse(new Util.handleResponse() {
+                                @Override
+                                public void handleResponses(String response) {
+                                    Log.i(TAG, "onResponse:   " + response);
+                                    ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
+                                    }.getType());
+                                    sendMessage(responseData.getMessage());
+                                }
+                            });
+                           util.doPost(SearchPointActivity.this,request);
                         }
                     }
                 })
@@ -145,14 +152,6 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                 .show();
     }
 
-    @Override
-    public void handleResponse(String response) {
-        super.handleResponse(response);
-        Log.i(TAG, "onResponse:   " + response);
-        ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
-        }.getType());
-        sendMessage(responseData.getMessage());
-    }
 
     @Override
     public void onDestroy() {

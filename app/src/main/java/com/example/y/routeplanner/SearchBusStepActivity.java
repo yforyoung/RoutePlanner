@@ -7,7 +7,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.LinearLayout;
+
 import android.widget.TextView;
 
 import com.amap.api.services.busline.BusLineItem;
@@ -16,7 +16,7 @@ import com.amap.api.services.busline.BusStationQuery;
 import com.amap.api.services.busline.BusStationResult;
 import com.amap.api.services.busline.BusStationSearch;
 import com.amap.api.services.help.Tip;
-import com.example.y.routeplanner.adapter.BusLineAdapter;
+
 import com.example.y.routeplanner.adapter.BusStepAdapter;
 import com.example.y.routeplanner.util.Test;
 

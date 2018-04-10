@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 
@@ -23,9 +24,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 
 public class Util {
+    private handleResponse handleResponse;
     public Util() {
+
+    }
+
+    public void setHandleResponse(Util.handleResponse handleResponse) {
+        this.handleResponse = handleResponse;
     }
 
     public void save(String data, Context context) {
@@ -88,7 +101,38 @@ public class Util {
         Intent intent = new Intent(context, StartActivity.class);
         context.startActivity(intent);
         context.finish();
+    }
 
 
+    public void doPost(AppCompatActivity context,final Request request){
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+                client.newCall(request).enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    }
+                    @Override
+                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        String s=response.body().string();
+                        handleResponse(s);
+                    }
+                });
+            }
+        });
+    }
+
+    private void handleResponse(String s){
+        if (handleResponse!=null){
+            handleResponse.handleResponses(s);
+        }
+    }
+
+    public void doPost(Request request) {
+    }
+
+    public interface handleResponse{
+        void handleResponses(String response);
     }
 }

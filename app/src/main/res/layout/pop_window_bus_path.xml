@@ -26,14 +26,16 @@
             android:layout_marginRight="18dp"
             android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="18dp">
             <ImageView
                 android:src="@drawable/ic_collection"
                 android:layout_width="24dp"
                 android:layout_height="24dp" />
             <TextView
                 android:text="收藏"
-                android:textSize="13dp"
+                android:textSize="13sp"
                 android:textColor="#ffffff"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />

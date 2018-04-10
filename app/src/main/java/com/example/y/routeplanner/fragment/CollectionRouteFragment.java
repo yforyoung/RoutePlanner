@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.example.y.routeplanner.BaseActivity;
+import com.example.y.routeplanner.CollectionActivity;
 import com.example.y.routeplanner.R;
 import com.example.y.routeplanner.adapter.CollectionRouteAdapter;
 import com.example.y.routeplanner.gson.CollectionRoute;
@@ -31,6 +34,7 @@ import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
+import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -100,49 +104,49 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
         }
     }
 
+
+
     private void refresh() {
-        getActivity().runOnUiThread(new Runnable() {
+        RequestBody requestBody = new FormBody.Builder()
+                .add("user_id", user.getUserId()+"")
+                .build();
+        Request request = new Request.Builder()
+                .url("http://120.77.170.124:8080/busis/collection/query.do")
+                .post(requestBody)
+                .build();
+        Util util=new Util();
+        util.setHandleResponse(new Util.handleResponse() {
             @Override
-            public void run() {
-                OkHttpClient client = new OkHttpClient();
-                RequestBody requestBody = new FormBody.Builder()
-                        .add("user_id", user.getUserId()+"")
-                        .build();
-                Request request = new Request.Builder()
-                        .url("http://120.77.170.124:8080/busis/collection/query.do")
-                        .post(requestBody)
-                        .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
+            public void handleResponses(String response) {
+                Log.i(TAG, "onResponse: " + response);
+                ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionRoute>>>() {
+                }.getType());
 
+                Message message = new Message();
+                if (responseData.getCode() == 1) {
+                    myPathList.clear();
+                    list = (List<CollectionRoute>) responseData.getData();
+                    for (CollectionRoute cr : list) {
+                        myPathList.add(cr.getRoute_information());
                     }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String s=response.body().string();
-                        Log.i(TAG, "onResponse: "+s);
-                        ResponseData responseData=new Gson().fromJson(s,new TypeToken<ResponseData<List<CollectionRoute>>>(){}.getType());
-
-                        Message message=new Message();
-                        if (responseData.getCode()==1){
-                            myPathList.clear();
-                            list= (List<CollectionRoute>) responseData.getData();
-                            for (CollectionRoute cr : list){
-                                myPathList.add(cr.getRoute_information());
-                            }
-                            message.what=1;
-                            handler.sendMessage(message);
-                        }
-
-                    }
-                });
+                    message.what = 1;
+                    handler.sendMessage(message);
+                }
             }
         });
+        util.doPost((AppCompatActivity) getActivity(),request);
     }
 
     @Override
     public void onItemClick(View v, int position) {
-        initPopUpWindow();
+        popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
+        popLinearLayout = popContentView.findViewById(R.id.pop_linear_layout);
+
+        LinearLayout co=popContentView.findViewById(R.id.coll_button);
+        co.setVisibility(View.INVISIBLE);
+
+        popupWindow = new PopupWindow(getActivity());
+        ((BaseActivity)getActivity()).initPopUpWindow(popupWindow);
         popLinearLayout.removeAllViews();
         List<MyRoute> myRoutes=myPathList.get(position).getRoutes();
         for (int i=0;i<myRoutes.size();i++){
@@ -177,28 +181,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
         popupWindow.setContentView(popContentView);
         @SuppressLint("InflateParams") View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_collection, null);
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
-    }
-
-    @SuppressLint("InflateParams")
-    private void initPopUpWindow(){
-        popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
-        popLinearLayout = popContentView.findViewById(R.id.pop_linear_layout);
-        popupWindow = new PopupWindow(getActivity());
-        popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(0));
-        popupWindow.setTouchable(true);
-        popupWindow.setTouchInterceptor(new View.OnTouchListener() {
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return false;
-            }
-        });
-        popupWindow.setAnimationStyle(R.style.PopupAnimation);
-        popupWindow.setClippingEnabled(true);
-        popupWindow.setFocusable(true);
-
     }
 
     @Override

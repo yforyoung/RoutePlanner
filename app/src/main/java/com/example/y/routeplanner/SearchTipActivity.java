@@ -23,7 +23,6 @@ import java.util.List;
 
 public class SearchTipActivity extends BaseActivity implements Inputtips.InputtipsListener {
     private EditText search;
-    private RecyclerView recyclerView;
     private List<Tip> tipList;
     private InputtipsQuery query;
     private Inputtips inputtips;
@@ -36,7 +35,7 @@ public class SearchTipActivity extends BaseActivity implements Inputtips.Inputti
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_search_tip);
         search = findViewById(R.id.search_edit);
-        recyclerView = findViewById(R.id.search_list);
+        RecyclerView recyclerView = findViewById(R.id.search_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(manager);

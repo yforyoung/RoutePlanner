@@ -16,15 +16,11 @@ import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
+
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+
 
 import static android.content.ContentValues.TAG;
 
@@ -65,24 +61,27 @@ public class RegisterActivity extends BaseActivity {
                             .url("http://120.77.170.124:8080/busis/user/register.do")
                             .post(requestBody)
                             .build();
+                    Util util=new Util();
+                    util.setHandleResponse(new Util.handleResponse() {
+                        @Override
+                        public void handleResponses(String response) {
+                            ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
+                            Log.i(TAG, "login: "+response);
+                            if (responseData.getCode()==1) {
+                                User user = (User) responseData.getData();
+                                new Util().login(RegisterActivity.this,user);
+                            }else {
+                                sendMessage(responseData.getMessage());
+                            }
+                        }
+                    });
 
-                    doPost(request);
+                   util.doPost(RegisterActivity.this,request);
                 }
             }
         });
 
     }
 
-    @Override
-    public void handleResponse(String response) {
-        super.handleResponse(response);
-        ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
-        Log.i(TAG, "login: "+response);
-        if (responseData.getCode()==1) {
-            User user = (User) responseData.getData();
-            new Util().login(RegisterActivity.this,user);
-        }else {
-            sendMessage(responseData.getMessage());
-        }
-    }
+
 }
