@@ -1,12 +1,9 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-
     <padding android:right="2dp"
         android:top="2dp"
         android:left="2dp"
         android:bottom="5dp"/>
-
 
         <stroke
             android:color="@color/colorSearch"

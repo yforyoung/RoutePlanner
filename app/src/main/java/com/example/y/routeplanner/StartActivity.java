@@ -3,6 +3,7 @@ package com.example.y.routeplanner;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -24,13 +25,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
-import android.util.Log;
+import android.text.Layout;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,7 +54,6 @@ import com.jude.rollviewpager.hintview.ColorPointHintView;
 
 import java.io.File;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,14 +61,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 
 import okhttp3.FormBody;
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -92,7 +92,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_main);
+        setContentView(R.layout.activity_main);
         intent = new Intent();
 
         request();          //请求权限
@@ -128,9 +128,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        rollPagerView=findViewById(R.id.roll_view_pager);
+        rollPagerView = findViewById(R.id.roll_view_pager);
         rollPagerView.setPlayDelay(5000);
-        rollPagerView.setHintView(new ColorPointHintView(this, Color.parseColor("#ff228c8a"),Color.WHITE));
+        rollPagerView.setHintView(new ColorPointHintView(this, Color.parseColor("#ff228c8a"), Color.WHITE));
         rollPagerView.setAdapter(new RollPagerAdapter());
 
 
@@ -161,9 +161,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void loadProfile() {            //加载网络图片
-        String profilePath=Test.getInstance().user.getHeadPortrail();
+        String profilePath = Test.getInstance().user.getHeadPortrail();
         Glide.with(this).load(profilePath)
-               // .error(R.drawable.load_error)
+                .error(R.drawable.load_error)
                 .into(profile);
 
     }
@@ -223,7 +223,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             case R.id.user_log:
                 intent.setClass(this, LoadActivity.class);
                 startActivity(intent);
-                finish();
                 break;
             case R.id.user_profile:
                 Toast.makeText(StartActivity.this, "click profile", Toast.LENGTH_SHORT).show();
@@ -260,8 +259,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
             if (!readPicPath().equals("")) {
-                loadProfile();
-              // setProfile(readPicPath());
+                //loadProfile();
+                setProfile(readPicPath());
             }
 
         } else {
@@ -299,27 +298,75 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.setting:
-                intent.setClass(this, SetActivity.class);
-                startActivity(intent);
+                if (Test.getInstance().loginOrNot == 0) {
+                    Toast.makeText(this, "请先登陆!", Toast.LENGTH_SHORT).show();
+                } else {
+                    intent.setClass(this, SetActivity.class);
+                    startActivity(intent);
+                }
                 break;
             case R.id.exit:
                 finish();
                 break;
             case R.id.log_out:
-                SharedPreferences.Editor editor = getSharedPreferences("user", MODE_PRIVATE).edit();
-                editor.putInt("login", 0);
-                editor.apply();
-                Test.getInstance().user = null;
-                Test.getInstance().loginOrNot = 0;    //设置未登陆
-                Intent intent = new Intent(this, LoadActivity.class);
-                startActivity(intent);
-                finish();
+                if (Test.getInstance().loginOrNot == 0) {
+                    Toast.makeText(this, "请先登陆!", Toast.LENGTH_SHORT).show();
+                } else {
+                    SharedPreferences.Editor editor = getSharedPreferences("user", MODE_PRIVATE).edit();
+                    editor.putInt("login", 0);
+                    editor.apply();
+                    Test.getInstance().user = null;
+                    Test.getInstance().loginOrNot = 0;    //设置未登陆
+                    Intent intent = new Intent(this, LoadActivity.class);
+                    startActivity(intent);
+                }
                 break;
-            case R.id.city:
-                Toast.makeText(this, "更换城市", Toast.LENGTH_SHORT).show();
+            case R.id.change_passwd:        //dialog
+                if (Test.getInstance().loginOrNot == 0) {
+                    Toast.makeText(this, "请先登陆!", Toast.LENGTH_SHORT).show();
+                } else {
+                    changePasswd();
+                }
                 break;
         }
         return true;
+    }
+
+    private void changePasswd() {
+
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_chang_passwd, null);
+        final EditText op=view.findViewById(R.id.old_passwd);
+        final EditText np=view.findViewById(R.id.new_passwd);
+
+        new AlertDialog.Builder(this).setTitle("修改密码")
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String sOp=op.getText().toString().trim();
+                        String sNp=np.getText().toString().trim();  //后台未完成
+                      /*
+                        RequestBody requestBody=new FormBody.Builder()
+                                .build();
+                        Request request=new Request.Builder()
+                                .url("")
+                                .post(requestBody)
+                                .build();
+                        Util util=new Util();
+                        util.setHandleResponse(new Util.handleResponse() {
+                            @Override
+                            public void handleResponses(String response) {
+
+                            }
+                        });
+                        util.doPost(StartActivity.this,request);*/
+
+
+                    }
+                })
+                .setNegativeButton("取消", null)
+                .show();
+
     }
 
     @Override
@@ -340,7 +387,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         Uri uri = data.getData();
         String imagePath = getImagePath(uri, null);
         if (picSaved(imagePath)) {
-            loadProfile();
+            //loadProfile();
         }
     }
 
@@ -368,7 +415,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             }
         }
         if (picSaved(imagePath)) {
-            loadProfile();
+            setProfile(imagePath);
+            // loadProfile();
         }
 
 
@@ -392,7 +440,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("head_portrail", imagePath,RequestBody.create(MediaType.parse("image/*"),new File(imagePath)))
+                .addFormDataPart("head_portrail", imagePath, RequestBody.create(MediaType.parse("image/*"), new File(imagePath)))
                 .addFormDataPart("user_id", Test.getInstance().user.getUserId())
                 .build();
 
@@ -405,14 +453,14 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             @Override
             public void handleResponses(String response) {
 
-                User user=Test.getInstance().user;
+                User user = Test.getInstance().user;
                 user.setHeadPortrail(response);
-                Gson gson=new Gson();
-                String data=gson.toJson(user);
-                util.save(data,getApplicationContext());
+                Gson gson = new Gson();
+                String data = gson.toJson(user);
+                util.save(data, getApplicationContext());
             }
         });
-        util.doPost(StartActivity.this,request);
+        util.doPost(StartActivity.this, request);
 
     }
 

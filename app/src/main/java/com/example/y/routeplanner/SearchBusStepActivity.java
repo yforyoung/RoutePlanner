@@ -21,7 +21,6 @@ import com.example.y.routeplanner.adapter.BusStepAdapter;
 import com.example.y.routeplanner.util.Test;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 public class SearchBusStepActivity extends BaseActivity implements BusStationSearch.OnBusStationSearchListener{
@@ -32,7 +31,7 @@ public class SearchBusStepActivity extends BaseActivity implements BusStationSea
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_search_bus_step);
+        setContentView(R.layout.activity_search_bus_step);
         setToolBar("搜索站台",SearchBusStepActivity.this,SEARCH_BUS_STEP);
 
         stationName=findViewById(R.id.station_name);

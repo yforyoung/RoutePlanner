@@ -2,14 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/setting"
-        android:title="设置"
+        android:title="编辑个人信息"
         android:icon="@drawable/ic_setting"
         />
     <item
+        android:id="@+id/change_passwd"
+        android:title="修改密码"
+        android:icon="@drawable/ic_edit"
+        />
+   <!-- <item
         android:id="@+id/city"
         android:title="更换城市"
         android:icon="@drawable/ic_city"
-        />
+        />-->
     <item
         android:id="@+id/log_out"
         android:title="注销"

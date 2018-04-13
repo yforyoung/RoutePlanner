@@ -85,7 +85,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_search_path);
+        setContentView(R.layout.activity_search_path);
         initView();
         aMLocation = Test.getInstance().aMapLocation;
         cityCode = Test.getInstance().cityCode;
@@ -321,7 +321,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
 
         }
         popupWindow.setContentView(popContentView);
-        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(SearchPathActivity.this).inflate(R.layout.layout_search_path, null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(SearchPathActivity.this).inflate(R.layout.activity_search_path, null);
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
 
     }

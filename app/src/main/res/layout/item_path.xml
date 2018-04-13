@@ -6,42 +6,54 @@
     android:layout_height="wrap_content">
     <LinearLayout
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="20dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
             android:id="@+id/route_step"
             android:layout_gravity="center"
-            android:gravity="center"
+            android:gravity="left"
             android:textStyle="bold"
             android:textColor="#000"
             android:textSize="18sp"
-            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/path_first"
+            android:visibility="invisible"
+            android:layout_gravity="center"
+            android:textSize="12sp"
+            android:textColor="#fff"
+            android:background="#f75e94"
+            android:padding="3dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
 
     <LinearLayout
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
         android:id="@+id/route_time"
-        android:layout_marginLeft="20dp"
+            android:layout_marginLeft="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
             android:layout_marginStart="20dp" />
         <TextView
             android:id="@+id/route_walk"
+
             android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp" />
         <TextView
             android:id="@+id/route_money"
+
             android:layout_marginLeft="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

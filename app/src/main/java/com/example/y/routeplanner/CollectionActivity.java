@@ -23,7 +23,7 @@ public class CollectionActivity extends BaseActivity implements BottomNavigation
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_collection);
+        setContentView(R.layout.activity_collection);
         collectionViewPager=findViewById(R.id.collection_container);
         bottomNavigationView=findViewById(R.id.coll);
 

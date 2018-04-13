@@ -19,6 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.y.routeplanner.gson.ResponseData;
@@ -33,34 +34,33 @@ import com.google.gson.reflect.TypeToken;
 import java.util.Calendar;
 
 
-
 import okhttp3.FormBody;
 
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
 
-public class SetActivity extends BaseActivity implements View.OnClickListener,View.OnFocusChangeListener{
-    private static final String TAG ="setting" ;
-    private EditText username,telephone,introduce;
-    private TextView gender,birthday;
+public class SetActivity extends BaseActivity implements View.OnClickListener, View.OnFocusChangeListener {
+    private static final String TAG = "setting";
+    private EditText username, telephone, introduce;
+    private TextView gender, birthday;
     private User user;
-    private String textUserName,textGender,textBirthday,textTel,textIntro;
+    private String textUserName, textGender, textBirthday, textTel, textIntro;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_set);
-        user=Test.getInstance().user;
+        setContentView(R.layout.activity_set);
+        user = Test.getInstance().user;
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-        username=findViewById(R.id.username_change);
-        gender=findViewById(R.id.gender_change);
-        birthday=findViewById(R.id.birthday_change);
-        telephone=findViewById(R.id.telephone_change);
-        introduce=findViewById(R.id.introduce_change);
+        username = findViewById(R.id.username_change);
+        gender = findViewById(R.id.gender_change);
+        birthday = findViewById(R.id.birthday_change);
+        telephone = findViewById(R.id.telephone_change);
+        introduce = findViewById(R.id.introduce_change);
 
         username.setText(user.getUserName());
         gender.setText(user.getGender());
@@ -83,12 +83,11 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
         });
 
 
-
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.set_menu,menu);
+        getMenuInflater().inflate(R.menu.set_menu, menu);
         return true;
     }
 
@@ -101,25 +100,25 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.birthday_change:
                 Calendar calendar = Calendar.getInstance();
                 int year = calendar.get(Calendar.YEAR);
                 int month = calendar.get(Calendar.MONTH);
                 int day = calendar.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog.OnDateSetListener listener=new DatePickerDialog.OnDateSetListener() {
+                DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                        birthday.setText(i+"-"+(++i1)+"-"+i2);
+                        birthday.setText(i + "-" + (++i1) + "-" + i2);
                     }
                 };
-                DatePickerDialog dialog=new DatePickerDialog(SetActivity.this, 0,listener, year, month, day);
+                DatePickerDialog dialog = new DatePickerDialog(SetActivity.this, 0, listener, year, month, day);
                 dialog.show();
                 break;
             case R.id.gender_change:
-                AlertDialog.Builder builder=new AlertDialog.Builder(SetActivity.this);
-                final String s[]=new String[]{"男", "女"};
+                AlertDialog.Builder builder = new AlertDialog.Builder(SetActivity.this);
+                final String s[] = new String[]{"男", "女"};
                 builder.setItems(s, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -130,91 +129,93 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
                 break;
         }
     }
-    private void changeInfo(final String userId){
 
-        final String gen=gender.getText().toString();
-        final String a=username.getText().toString();
+    private void changeInfo(final String userId) {
+
+        final String gen = gender.getText().toString();
+        final String a = username.getText().toString();
         final int b;
         if (gen.equals("男")) {
-            b=1;
-        }else{
-            b=0;
+            b = 1;
+        } else {
+            b = 0;
         }
-        final  String c=birthday.getText().toString();
-        final  String d=introduce.getText().toString();
-        final String e=telephone.getText().toString();
+        final String c = birthday.getText().toString();
+        final String d = introduce.getText().toString();
+        final String e = telephone.getText().toString();
 
-        textUserName=a;
-        textTel=e;
-        textBirthday=c;
-        textGender=gen;
-        textIntro=d;
+        textUserName = a;
+        textTel = e;
+        textBirthday = c;
+        textGender = gen;
+        textIntro = d;
 
         RequestBody requestBody = new FormBody.Builder()
                 .add("user_id", userId)
                 .add("username", a)
-                .add("gender",String.valueOf(b))
-                .add("birthday",c)
-                .add("introduce",d)
-                .add("telphone",e)
+                .add("gender", String.valueOf(b))
+                .add("birthday", c)
+                .add("introduce", d)
+                .add("telphone", e)
                 .build();
         Request request = new Request.Builder()
                 .url("http://120.77.170.124:8080/busis/user/modify.do")
                 .post(requestBody)
                 .build();
-        final Util util=new Util();
+        final Util util = new Util();
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "onResponse: "+response);
-                ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<String>>(){}.getType());
-                if (responseData.getCode()==1){
+                Log.i(TAG, "onResponse: " + response);
+                ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<String>>() {
+                }.getType());
+                if (responseData.getCode() == 1) {
                     user.setUserName(textUserName);
                     user.setGender(textGender);
                     user.setBirthday(textBirthday);
                     user.setIntroduce(textIntro);
                     user.setTelphone(textTel);
-                    Test.getInstance().user=user;       //修改用户信息
-                    util.save(new Gson().toJson(user),getApplicationContext());        //覆盖本地用户信息
+                    Test.getInstance().user = user;       //修改用户信息
+                    util.save(new Gson().toJson(user), getApplicationContext());        //覆盖本地用户信息
                     sendMessage("修改成功！");
-                }else{
+                } else {
                     sendMessage(responseData.getMessage());
                 }
                 finish();
             }
         });
 
-        util.doPost(SetActivity.this,request);
+        util.doPost(SetActivity.this, request);
     }
 
 
     @Override
     public void onFocusChange(View view, boolean b) {
         hideInput();
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.birthday_change:
-                if (b){
+                if (b) {
 
                     Calendar calendar = Calendar.getInstance();
                     int year = calendar.get(Calendar.YEAR);
                     int month = calendar.get(Calendar.MONTH);
                     int day = calendar.get(Calendar.DAY_OF_MONTH);
-                    DatePickerDialog.OnDateSetListener listener=new DatePickerDialog.OnDateSetListener() {
+                    DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                            birthday.setText(i+"-"+(++i1)+"-"+i2);
+                            birthday.setText(i + "-" + (++i1) + "-" + i2);
                         }
                     };
-                    DatePickerDialog dialog=new DatePickerDialog(SetActivity.this, 0,listener, year, month, day);
+                    DatePickerDialog dialog = new DatePickerDialog(SetActivity.this, 0, listener, year, month, day);
                     dialog.show();
                 }
                 break;
             case R.id.gender_change:
-                if (b){
+                if (b) {
 
-                    AlertDialog.Builder builder=new AlertDialog.Builder(SetActivity.this);
-                    final String s[]=new String[]{"男", "女"};
+                    AlertDialog.Builder builder = new AlertDialog.Builder(SetActivity.this);
+                    final String s[] = new String[]{"男", "女"};
                     builder.setItems(s, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
@@ -227,7 +228,7 @@ public class SetActivity extends BaseActivity implements View.OnClickListener,Vi
         }
     }
 
-    public void hideInput(){
+    public void hideInput() {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         assert imm != null;
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);

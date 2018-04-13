@@ -1,5 +1,6 @@
 package com.example.y.routeplanner.adapter;
 
+import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +19,11 @@ import java.util.List;
 
 
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> implements AdapterView.OnClickListener{
-    private List<BusPath> busPathList=new ArrayList<>();
+    private List<BusPath> busPathList;
     private OnItemClickListener onItemClickListener=null;
+    private int minTime=100000;
+    private int minWalk=100000;
+    private int minChange=100000;
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.item_path,parent,false);
@@ -28,6 +32,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
         return holder;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         BusPath busPath=busPathList.get(position);
@@ -78,22 +83,24 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
 
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView time,walk,money,step;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        TextView time,walk,money,step,pathFirst;
 
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             time=itemView.findViewById(R.id.route_time);
             walk=itemView.findViewById(R.id.route_walk);
             money=itemView.findViewById(R.id.route_money);
             step=itemView.findViewById(R.id.route_step);
+            pathFirst=itemView.findViewById(R.id.path_first);
         }
     }
 
 
     public RouteAdapter(List<BusPath> busPathList) {
         this.busPathList = busPathList;
+
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {

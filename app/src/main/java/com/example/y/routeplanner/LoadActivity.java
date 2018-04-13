@@ -29,61 +29,76 @@ import static android.content.ContentValues.TAG;
 
 
 
-public class LoadActivity extends BaseActivity{
+public class LoadActivity extends BaseActivity implements View.OnClickListener{
     private EditText telInput, passwordInput;
     private String tel = "", password = "";
+
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_load);
+        setContentView(R.layout.activity_load);
         telInput = findViewById(R.id.tel);
         passwordInput = findViewById(R.id.passwd);
         Button load = findViewById(R.id.load_button);
         TextView register = findViewById(R.id.register);
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        TextView find=findViewById(R.id.forget_passwd);
+        showToolBar();
+        register.setOnClickListener(this);
+        load.setOnClickListener(this);
+        find.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.load_button:
+                load();
+                break;
+            case R.id.register:
                 Intent intent = new Intent(LoadActivity.this, RegisterActivity.class);
                 startActivity(intent);
-            }
-        });
-        load.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                tel = telInput.getText().toString();
-                password = passwordInput.getText().toString();
-                Log.i(TAG, "onClick: "+tel+"    "+password);
-                if (!tel .equals("") && !password.equals("")) {
+                break;
+            case R.id.forget_passwd:
+                Intent intent1 = new Intent(LoadActivity.this, FindPasswdActivity.class);
+                startActivity(intent1);
+                break;
+        }
 
-                    RequestBody requestBody = new FormBody.Builder()
-                            .add("account", tel)
-                            .add("password", password)
-                            .build();
-                    Request request = new Request.Builder()
-                            .url("http://120.77.170.124:8080/busis/user/login.do")
-                            .post(requestBody)
-                            .build();
-                    Util util=new Util();
-                    util.setHandleResponse(new Util.handleResponse() {
-                        @Override
-                        public void handleResponses(String response) {
-                            ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
-                            Log.i(TAG, "login: "+response);
-                            if (responseData.getCode()==1) {
-                                User user = (User) responseData.getData();
-                                new Util().login(LoadActivity.this,user);
-                            }else {
-                                sendMessage("用户名或密码错误！");
-                            }
-                        }
-                    });
-                    util.doPost(LoadActivity.this,request);
-                }else{
-                    Toast.makeText(LoadActivity.this, "请输入登陆信息！", Toast.LENGTH_SHORT).show();
+    }
+
+    private void load() {
+        tel = telInput.getText().toString();
+        password = passwordInput.getText().toString();
+        Log.i(TAG, "onClick: "+tel+"    "+password);
+        if (!tel .equals("") && !password.equals("")) {
+
+            RequestBody requestBody = new FormBody.Builder()
+                    .add("account", tel)
+                    .add("password", password)
+                    .build();
+            Request request = new Request.Builder()
+                    .url("http://120.77.170.124:8080/busis/user/login.do")
+                    .post(requestBody)
+                    .build();
+            Util util=new Util();
+            util.setHandleResponse(new Util.handleResponse() {
+                @Override
+                public void handleResponses(String response) {
+                    Log.i(TAG, "login: "+response);
+                    ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());        //后台数据格式
+                    if (responseData.getCode()==1) {
+                        User user = (User) responseData.getData();
+                        new Util().login(LoadActivity.this,user);
+                    }else {
+                        sendMessage("用户名或密码错误！");
+                    }
                 }
-            }
-        });
+            });
+            util.doPost(LoadActivity.this,request);
+        }else{
+            Toast.makeText(LoadActivity.this, "请输入登陆信息！", Toast.LENGTH_SHORT).show();
+        }
     }
 }

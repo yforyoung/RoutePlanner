@@ -38,7 +38,7 @@ public class SearchBusLineActivity extends BaseActivity implements BusLineSearch
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_search_bus_line);
+        setContentView(R.layout.activity_search_bus_line);
         setToolBar("搜索公交线路",SearchBusLineActivity.this,SEARCH_BUS_LINT);
 
         lineHead=findViewById(R.id.line_head);

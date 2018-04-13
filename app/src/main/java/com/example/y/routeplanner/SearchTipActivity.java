@@ -33,7 +33,7 @@ public class SearchTipActivity extends BaseActivity implements Inputtips.Inputti
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_search_tip);
+        setContentView(R.layout.activity_search_tip);
         search = findViewById(R.id.search_edit);
         RecyclerView recyclerView = findViewById(R.id.search_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));

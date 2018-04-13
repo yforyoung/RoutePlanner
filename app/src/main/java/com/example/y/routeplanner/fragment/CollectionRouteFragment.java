@@ -3,7 +3,6 @@ package com.example.y.routeplanner.fragment;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -24,14 +22,12 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.example.y.routeplanner.BaseActivity;
-import com.example.y.routeplanner.CollectionActivity;
 import com.example.y.routeplanner.R;
 import com.example.y.routeplanner.adapter.CollectionRouteAdapter;
 import com.example.y.routeplanner.gson.CollectionRoute;
 import com.example.y.routeplanner.gson.MyPath;
 import com.example.y.routeplanner.gson.MyRoute;
 import com.example.y.routeplanner.gson.ResponseData;
-import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
@@ -179,7 +175,7 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
             popLinearLayout.addView(v1);
         }
         popupWindow.setContentView(popContentView);
-        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_collection, null);
+        @SuppressLint("InflateParams") View rootView = LayoutInflater.from(getActivity()).inflate(R.layout.activity_collection, null);
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM, 0, 0);
     }
 
