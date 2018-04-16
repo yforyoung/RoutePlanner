@@ -1,6 +1,7 @@
 package com.example.y.routeplanner;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
 import android.content.DialogInterface;
@@ -28,7 +29,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
-import android.text.Layout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -60,7 +61,6 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 
@@ -76,7 +76,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     private LinearLayout view;
     private DrawerLayout drawerLayout;
     private CircleImageView profile;
-    private RollPagerView rollPagerView;
     Intent intent;
 
     private String[] permissions = new String[]{
@@ -98,19 +97,10 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         request();          //请求权限
         initView();         //初始化视图
         util = new Util();
-        SharedPreferences spf = getSharedPreferences("user", MODE_PRIVATE);
-        if (spf.getInt("login", 0) == 1) {                       //获取本地用户信息,设置单例
-            Test.getInstance().loginOrNot = 1;
-            initUser();
-        }
-        initUserInfo();
+
         getLocation();
-
     }
 
-    private void initUser() {
-        Test.getInstance().user = new Gson().fromJson(util.read(getApplicationContext()), User.class);
-    }
 
     public void initView() {
         Toolbar toolbar = findViewById(R.id.toolbar_main);
@@ -128,7 +118,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        rollPagerView = findViewById(R.id.roll_view_pager);
+        RollPagerView rollPagerView = findViewById(R.id.roll_view_pager);
         rollPagerView.setPlayDelay(5000);
         rollPagerView.setHintView(new ColorPointHintView(this, Color.parseColor("#ff228c8a"), Color.WHITE));
         rollPagerView.setAdapter(new RollPagerAdapter());
@@ -160,24 +150,12 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     }
 
-    private void loadProfile() {            //加载网络图片
-        String profilePath = Test.getInstance().user.getHeadPortrail();
-        Glide.with(this).load(profilePath)
-                .error(R.drawable.load_error)
-                .into(profile);
-
-    }
-
     @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-
             drawerLayout.closeDrawer(GravityCompat.START);
-
         } else {
-
             super.onBackPressed();
-
         }
     }
 
@@ -252,20 +230,48 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void initUserInfo() {
-        if (Test.getInstance().loginOrNot == 1) {      //登陆
+        //登陆
+        SharedPreferences spf = getSharedPreferences("user", MODE_PRIVATE);
+        if (spf.getInt("login", 0) == 1) {                       //获取本地用户信息,设置单例
+            Test.getInstance().loginOrNot = 1;
+            Test.getInstance().user = new Gson().fromJson(util.read(getApplicationContext()), User.class);
             User user = Test.getInstance().user;
             load.setVisibility(View.GONE);
             view.setVisibility(View.VISIBLE);
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
-            if (!readPicPath().equals("")) {
-                //loadProfile();
-                setProfile(readPicPath());
-            }
 
+            if (!readPicPathFromLocal().equals("")) {
+                setProfile(readPicPathFromLocal());
+            } else {
+                loadProfileFromServer();
+            }
         } else {
             view.setVisibility(View.GONE);
             load.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    private void setProfile(final String imagePath) {
+        if (imagePath != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+            final BitmapDrawable bd = new BitmapDrawable(bitmap);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                profile.setImageDrawable(bd);
+            }
+            //设置背景
+        } else {
+            Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadProfileFromServer() {            //加载网络图片
+        String profilePath = Test.getInstance().user.getHeadPortrail();
+        if (!profilePath.equals("")) {
+            Glide.with(this).load(profilePath)
+                    .error(R.drawable.load_error)
+                    .into(profile);
         }
     }
 
@@ -334,19 +340,18 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     private void changePasswd() {
 
-        View view = LayoutInflater.from(this).inflate(R.layout.dialog_chang_passwd, null);
-        final EditText op=view.findViewById(R.id.old_passwd);
-        final EditText np=view.findViewById(R.id.new_passwd);
+        @SuppressLint("InflateParams") View view = LayoutInflater.from(this).inflate(R.layout.dialog_chang_passwd, null);
+        final EditText op = view.findViewById(R.id.old_passwd);
+        final EditText np = view.findViewById(R.id.new_passwd);
 
         new AlertDialog.Builder(this).setTitle("修改密码")
                 .setView(view)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String sOp=op.getText().toString().trim();
-                        String sNp=np.getText().toString().trim();  //后台未完成
-                      /*
-                        RequestBody requestBody=new FormBody.Builder()
+                        String sOp = op.getText().toString().trim();
+                        String sNp = np.getText().toString().trim();  //后台未完成
+                      /*  RequestBody requestBody=new FormBody.Builder()
                                 .build();
                         Request request=new Request.Builder()
                                 .url("")
@@ -376,18 +381,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 if (resultCode == RESULT_OK) {
                     if (Build.VERSION.SDK_INT >= 19) {
                         handleImageOnKitKat(data);
-                    } else
-                        handleImageBeforeKitKat(data);
+                    }
                 }
-        }
-    }
-
-
-    private void handleImageBeforeKitKat(Intent data) {
-        Uri uri = data.getData();
-        String imagePath = getImagePath(uri, null);
-        if (picSaved(imagePath)) {
-            //loadProfile();
         }
     }
 
@@ -413,30 +408,21 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             } else if ("file".equalsIgnoreCase(uri.getScheme())) {
                 imagePath = uri.getPath();
             }
-        }
-        if (picSaved(imagePath)) {
-            setProfile(imagePath);
-            // loadProfile();
-        }
+        }                       //读取图片路径
+
+        //设置头像
+        setProfile(imagePath);
+
+        //保存图片到服务器
+        savePicPathToServer(imagePath);
+
+        //保存图片到本地
+        savePicPathToLocal(imagePath);
 
 
     }
 
-    private void setProfile(final String imagePath) {
-        if (imagePath != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            final BitmapDrawable bd = new BitmapDrawable(bitmap);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                profile.setImageDrawable(bd);
-            }
-            //设置背景
-        } else {
-            Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    public void saveToServer(String imagePath) {
+    public void savePicPathToServer(String imagePath) {
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
@@ -445,7 +431,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://192.168.31.214:81/test/test.php")
+                .url("http://120.77.170.124:8080/busis/user/modify/head_portrail.do")
                 .post(requestBody)
                 .build();
 
@@ -453,6 +439,8 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             @Override
             public void handleResponses(String response) {
 
+                Log.i("head", "handleResponses: " + response);
+                //保存到userFile
                 User user = Test.getInstance().user;
                 user.setHeadPortrail(response);
                 Gson gson = new Gson();
@@ -464,17 +452,14 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     }
 
-    public boolean picSaved(final String picPath) {
-        SharedPreferences.Editor editor = getSharedPreferences("picPath", MODE_PRIVATE).edit();
+    public void savePicPathToLocal(final String picPath) {
+        SharedPreferences.Editor editor = getSharedPreferences("sher"+Test.getInstance().user.getUserId(), MODE_PRIVATE).edit();
         editor.putString("pic_path", picPath);
         editor.apply();     //存本地
-        //存网络
-        saveToServer(picPath);
-        return true;
     }
 
-    public String readPicPath() {
-        SharedPreferences preferences = getSharedPreferences("picPath", MODE_PRIVATE);
+    public String readPicPathFromLocal() {
+        SharedPreferences preferences = getSharedPreferences("sher"+Test.getInstance().user.getUserId(), MODE_PRIVATE);
         return preferences.getString("pic_path", "");
     }
 

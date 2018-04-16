@@ -9,7 +9,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,7 +38,6 @@ public class BaseActivity extends AppCompatActivity {
                 case SHOW_TOAST:
                     String s=msg.getData().getString("toast");
                     Toast.makeText(getApplicationContext(),s, Toast.LENGTH_SHORT).show();
-
                     break;
             }
         }

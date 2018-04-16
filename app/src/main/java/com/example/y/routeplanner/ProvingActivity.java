@@ -20,76 +20,109 @@ import okhttp3.RequestBody;
 
 import static android.content.ContentValues.TAG;
 
-public class ProvingActivity extends BaseActivity{          //用于验证码  修改密码、注册、找回密码
-    private String sCode="";
+public class ProvingActivity extends BaseActivity {          //用于验证码  修改密码、注册、找回密码
+    private String sCode = "";
     private Intent intent;
+    private EditText code;
+    private Util util = new Util();
+    private String sessionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_proving);
-        final EditText code=findViewById(R.id.register_prove_code);
-        final Button ok=findViewById(R.id.register_ok);
+        code = findViewById(R.id.register_prove_code);
+        final Button ok = findViewById(R.id.register_ok);
+
         ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 intent=getIntent();
-                 sCode=code.getText().toString().trim();
-                //判断code是否符合
-                int type=intent.getIntExtra("type",0);
-                if (type==0){       //注册
-                    register();
-                }else if (type==1){
-                    changePasswd();
+                intent = getIntent();
+                sCode = code.getText().toString().trim();
+                sessionId = getSharedPreferences("user", MODE_PRIVATE).getString("session_id", "");
+                if (!sessionId.equals("")) {
+                    //判断code是否符合
+                    if (!sCode.equals("")) {
+                        int type = intent.getIntExtra("type", 0);
+                        if (type == 0) {       //注册
+                            register();
+                        } else if (type == 1) {
+                            changePasswd();
+                        }
+                    } else {
+                        Toast.makeText(ProvingActivity.this, "请输入验证码！", Toast.LENGTH_SHORT).show();
+                    }
                 }
-
             }
         });
     }
 
     private void changePasswd() {
-        if (!sCode.equals("")&&isRight()){
-            String  tel=intent.getStringExtra("tel");
-            String passwd=intent.getStringExtra("passwd");
-        }
+        //String tel = intent.getStringExtra("tel");
+        String passwd = intent.getStringExtra("passwd");
+        RequestBody requestBody = new FormBody.Builder()
+                .add("code", sCode)
+                .add("password", passwd)
+                .build();
+        Request request = new Request.Builder()
+                .addHeader("cookie",sessionId)
+                .url("http://120.77.170.124:8080/busis/user/recover.do")
+                .post(requestBody)
+                .build();
+        util.setHandleResponse(new Util.handleResponse() {
+            @Override
+            public void handleResponses(String response) {
+                Log.i(TAG, "handleResponses: " + response);
+                sendMessage("密码已修改，请重新登陆");
+                Intent intent = new Intent(ProvingActivity.this, LoadActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        util.doPost(ProvingActivity.this, request);
+
+
     }
 
     private void register() {
-        if (!sCode.equals("")&&isRight()){
-            String sName=intent.getStringExtra("name");
-            String sTel=intent.getStringExtra("tel");
-            String sPasswd=intent.getStringExtra("passwd");
-            RequestBody requestBody=new FormBody.Builder()
-                    .add("username",sName)
-                    .add("telphone",sTel)
-                    .add("password",sPasswd)
-                    .build();
-            Request request=new Request.Builder()
-                    .url("http://120.77.170.124:8080/busis/user/register.do")
-                    .post(requestBody)
-                    .build();
-            Util util=new Util();
-            util.setHandleResponse(new Util.handleResponse() {
-                @Override
-                public void handleResponses(String response) {
-                    ResponseData responseData=new Gson().fromJson(response,new TypeToken<ResponseData<User>>(){}.getType());
-                    Log.i(TAG, "login: "+response);
-                    if (responseData.getCode()==1) {
-                        User user = (User) responseData.getData();
-                        new Util().login(ProvingActivity.this,user);
-                    }else {
-                        sendMessage(responseData.getMessage());
-                    }
+
+        String sName = intent.getStringExtra("name");
+        String sTel = intent.getStringExtra("tel");
+        String sPasswd = intent.getStringExtra("passwd");
+        String sCode = code.getText().toString().trim();
+        RequestBody requestBody = new FormBody.Builder()
+
+                .add("username", sName)
+                .add("telphone", sTel)
+                .add("password", sPasswd)
+                .add("code", sCode)
+                .build();
+        Request request = new Request.Builder()
+                .addHeader("cookie",sessionId)
+                .url("http://120.77.170.124:8080/busis/user/register.do")
+                .post(requestBody)
+                .build();
+
+        util.setHandleResponse(new Util.handleResponse() {
+            @Override
+            public void handleResponses(String response) {
+                Log.i(TAG, "login: " + response);
+                int code = Integer.parseInt(response.substring(8, 9));
+                if (code == 1) {
+                    ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<User>>() {
+                    }.getType());
+                    Log.i(TAG, "login: " + response);
+
+                    User user = (User) responseData.getData();
+                    new Util().login(ProvingActivity.this, user);
+                } else {
+                    ResponseData m = new Gson().fromJson(response, new TypeToken<ResponseData<String>>() {
+                    }.getType());
+                    sendMessage(m.getMessage());
                 }
-            });
+            }
+        });
 
-            util.doPost(ProvingActivity.this,request);
-        }else{
-            Toast.makeText(ProvingActivity.this, "验证码错误！", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public boolean isRight() {      //判断验证码
-        return true;
+        util.doPost(ProvingActivity.this, request);
     }
 }

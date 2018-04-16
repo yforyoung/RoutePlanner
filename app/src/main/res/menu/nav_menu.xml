@@ -10,11 +10,12 @@
         android:title="修改密码"
         android:icon="@drawable/ic_edit"
         />
-   <!-- <item
+    <item
+        android:actionLayout="@layout/notify"
         android:id="@+id/city"
-        android:title="更换城市"
-        android:icon="@drawable/ic_city"
-        />-->
+        android:title="公告"
+        android:icon="@drawable/ic_notifications"
+        />
     <item
         android:id="@+id/log_out"
         android:title="注销"
