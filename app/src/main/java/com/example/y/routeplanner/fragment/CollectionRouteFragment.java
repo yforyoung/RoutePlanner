@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -33,18 +31,11 @@ import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
 
@@ -52,11 +43,9 @@ import static android.content.ContentValues.TAG;
 public class CollectionRouteFragment extends Fragment implements CollectionRouteAdapter.OnItemClickListener,CollectionRouteAdapter.OnItemLongClickListener{
     private List<MyPath> myPathList;
     private User user;
-    private PopupWindow popupWindow;
-    private LinearLayout popLinearLayout;
-    private  View popContentView;
     private CollectionRouteAdapter adapter;
     private List<CollectionRoute> list;
+    private Util util=new Util();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -98,7 +87,7 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                 .url("http://120.77.170.124:8080/busis/collection/query.do")
                 .post(requestBody)
                 .build();
-        Util util=new Util();
+
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
@@ -120,15 +109,16 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
         util.doPost((AppCompatActivity) getActivity(),request);
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public void onItemClick(View v, int position) {
-        popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
-        popLinearLayout = popContentView.findViewById(R.id.pop_linear_layout);
+        View popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
+        LinearLayout popLinearLayout = popContentView.findViewById(R.id.pop_linear_layout);
 
-        LinearLayout co=popContentView.findViewById(R.id.coll_button);
+        LinearLayout co= popContentView.findViewById(R.id.coll_button);
         co.setVisibility(View.INVISIBLE);
 
-        popupWindow = new PopupWindow(getActivity());
+        PopupWindow popupWindow = new PopupWindow(getActivity());
         ((BaseActivity)getActivity()).initPopUpWindow(popupWindow);
         popLinearLayout.removeAllViews();
         List<MyRoute> myRoutes=myPathList.get(position).getRoutes();
@@ -183,7 +173,7 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                OkHttpClient client = new OkHttpClient();
+
                 RequestBody requestBody = new FormBody.Builder()
                         .add("collection_id", String.valueOf(collectionID))
                         .build();
@@ -191,17 +181,10 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                         .url("http://120.77.170.124:8080/busis/collection/delete.do")
                         .post(requestBody)
                         .build();
-                client.newCall(request).enqueue(new Callback() {
+                util.setHandleResponse(new Util.handleResponse() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String s = response.body().string();
-                        Log.i(TAG, "onResponse:删除路线 " + s);
-                        ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<String>>() {
+                    public void handleResponses(String response) {
+                        ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<String>>() {
                         }.getType());
                         if (responseData.getCode() == 1) {
                             myPathList.remove(position);
@@ -209,6 +192,8 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                         }
                     }
                 });
+
+                util.doPost((AppCompatActivity)getActivity(),request);
 
             }
         });

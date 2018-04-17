@@ -215,6 +215,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                             util.setHandleResponse(new Util.handleResponse() {
                                 @Override
                                 public void handleResponses(String response) {
+
                                     ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
                                     }.getType());
                                     sendMessage(responseData.getMessage());

@@ -1,15 +1,12 @@
 package com.example.y.routeplanner.fragment;
 
 
-import android.annotation.SuppressLint;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.os.Handler;
-import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -34,19 +31,11 @@ import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
-
 import static android.content.ContentValues.TAG;
 
 
@@ -54,6 +43,7 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
     private List<CollectionPoint> list;
     private User user;
     private CollectionPointAdapter adapter;
+    private Util util=new Util();
 
     @Nullable
     @Override
@@ -94,7 +84,7 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                 .post(requestBody)
                 .build();
 
-        Util util=new Util();
+
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
@@ -146,7 +136,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                OkHttpClient client = new OkHttpClient();
                 RequestBody requestBody = new FormBody.Builder()
                         .add("location_id", String.valueOf(locationId))
                         .build();
@@ -154,26 +143,19 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                         .url("http://120.77.170.124:8080/busis/location/delete.do")
                         .post(requestBody)
                         .build();
-                client.newCall(request).enqueue(new Callback() {
+
+                util.setHandleResponse(new Util.handleResponse() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
-
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String s = response.body().string();
-                        Log.i(TAG, "onResponse:删除点 " + s);
-
-                        ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<String>>() {
+                    public void handleResponses(String response) {
+                        ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<String>>() {
                         }.getType());
                         if (responseData.getCode() == 1) {
                             list.remove(position);
                             ((BaseActivity)getActivity()).sendMessage(adapter);
-
                         }
                     }
                 });
+                util.doPost((AppCompatActivity) getActivity(),request);
 
             }
         });
