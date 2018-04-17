@@ -12,7 +12,7 @@
         />
     <item
         android:actionLayout="@layout/notify"
-        android:id="@+id/city"
+        android:id="@+id/notify"
         android:title="公告"
         android:icon="@drawable/ic_notifications"
         />

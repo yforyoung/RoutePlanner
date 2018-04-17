@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,6 +28,7 @@ public class BaseActivity extends AppCompatActivity {
     public static final int SEARCH_END_POINT=3;
     public static final int SEARCH_BUS_LINT=4;
     public static final int SEARCH_BUS_STEP=5;
+    private RecyclerView.Adapter adapter;
 
 
     @SuppressLint("HandlerLeak")
@@ -38,6 +40,9 @@ public class BaseActivity extends AppCompatActivity {
                 case SHOW_TOAST:
                     String s=msg.getData().getString("toast");
                     Toast.makeText(getApplicationContext(),s, Toast.LENGTH_SHORT).show();
+                    break;
+                case 2:
+                    adapter.notifyDataSetChanged();
                     break;
             }
         }
@@ -60,15 +65,22 @@ public class BaseActivity extends AppCompatActivity {
         popupWindow.setClippingEnabled(true);
         popupWindow.setFocusable(true);
     }
-    public void sendMessage( String info){
+    public void sendMessage(String info){
         Message message=new Message();
         message.what=1;
         Bundle bundle=new Bundle();
         bundle.putString("toast",info);
         message.setData(bundle);
         handler.sendMessage(message);
+    }
+    public void sendMessage(RecyclerView.Adapter adapter){
+        Message message=new Message();
+        message.what=2;
+        this.adapter=adapter;
+        handler.sendMessage(message);
 
     }
+
 
     public void setToolBar(String s, final Context context, final int requestCode){
         LinearLayout linearLayout = findViewById(R.id.toolbar_content);

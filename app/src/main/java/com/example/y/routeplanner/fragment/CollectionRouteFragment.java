@@ -57,18 +57,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
     private  View popContentView;
     private CollectionRouteAdapter adapter;
     private List<CollectionRoute> list;
-    @SuppressLint("HandlerLeak")
-    private Handler handler=new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what){
-                case 1:
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
-        }
-    };
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -118,15 +106,14 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                 ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionRoute>>>() {
                 }.getType());
 
-                Message message = new Message();
+
                 if (responseData.getCode() == 1) {
                     myPathList.clear();
                     list = (List<CollectionRoute>) responseData.getData();
                     for (CollectionRoute cr : list) {
                         myPathList.add(cr.getRoute_information());
                     }
-                    message.what = 1;
-                    handler.sendMessage(message);
+                    ((BaseActivity)getActivity()).sendMessage(adapter);
                 }
             }
         });
@@ -214,13 +201,11 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
                     public void onResponse(Call call, Response response) throws IOException {
                         String s = response.body().string();
                         Log.i(TAG, "onResponse:删除路线 " + s);
-                        Message message = new Message();
                         ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<String>>() {
                         }.getType());
                         if (responseData.getCode() == 1) {
                             myPathList.remove(position);
-                            message.what = 1;
-                            handler.sendMessage(message);
+                            ((BaseActivity)getActivity()).sendMessage(adapter);
                         }
                     }
                 });

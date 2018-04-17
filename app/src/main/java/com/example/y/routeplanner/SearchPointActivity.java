@@ -225,7 +225,7 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("latlong");
         if (bundle != null) {
-            LatLng latLng = bundle.getParcelable("latlong");
+            latLng = bundle.getParcelable("latlong");
             aMap.addMarker(new MarkerOptions().position(latLng).title(""));
             move(latLng);
             aMap.setMyLocationEnabled(false);

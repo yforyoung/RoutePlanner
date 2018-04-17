@@ -46,10 +46,12 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
 import com.bumptech.glide.Glide;
 import com.example.y.routeplanner.adapter.RollPagerAdapter;
+import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.User;
 import com.example.y.routeplanner.util.Test;
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.jude.rollviewpager.RollPagerView;
 import com.jude.rollviewpager.hintview.ColorPointHintView;
 
@@ -61,6 +63,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 
@@ -97,12 +100,11 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         request();          //请求权限
         initView();         //初始化视图
         util = new Util();
-
         getLocation();
     }
 
 
-    public void initView() {
+    public void initView() {        //初始化视图
         Toolbar toolbar = findViewById(R.id.toolbar_main);
         toolbar.setTitle("");
         cityShow = toolbar.findViewById(R.id.city_show);
@@ -118,7 +120,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         navigationView.setNavigationItemSelectedListener(this);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        RollPagerView rollPagerView = findViewById(R.id.roll_view_pager);
+        RollPagerView rollPagerView = findViewById(R.id.roll_view_pager);       //滚动效果 使用rollviewpager框架
         rollPagerView.setPlayDelay(5000);
         rollPagerView.setHintView(new ColorPointHintView(this, Color.parseColor("#ff228c8a"), Color.WHITE));
         rollPagerView.setAdapter(new RollPagerAdapter());
@@ -159,7 +161,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         }
     }
 
-    public void request() {
+    public void request() {         //请求权限
         pList.clear();
         for (String permission : permissions) {
             if (ContextCompat.checkSelfPermission(StartActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
@@ -192,7 +194,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        initUserInfo();
+        initUserInfo();     //初始化用户信息
     }
 
     @Override
@@ -203,7 +205,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 startActivity(intent);
                 break;
             case R.id.user_profile:
-                Toast.makeText(StartActivity.this, "click profile", Toast.LENGTH_SHORT).show();
                 openAlbum();
                 break;
             case R.id.search_bus_path:
@@ -230,7 +231,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void initUserInfo() {
-        //登陆
+
         SharedPreferences spf = getSharedPreferences("user", MODE_PRIVATE);
         if (spf.getInt("login", 0) == 1) {                       //获取本地用户信息,设置单例
             Test.getInstance().loginOrNot = 1;
@@ -241,8 +242,12 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
 
-            if (!readPicPathFromLocal().equals("")) {
-                setProfile(readPicPathFromLocal());
+            if (!readPicPathFromLocal().equals("")) {       //设置头像 本地有则读取本地图片 无则加载网络图片
+                File file = new File(readPicPathFromLocal());
+                if (file.exists())
+                    setProfile(readPicPathFromLocal());
+                else
+                    loadProfileFromServer();
             } else {
                 loadProfileFromServer();
             }
@@ -253,20 +258,19 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
     }
 
-    private void setProfile(final String imagePath) {
+    private void setProfile(final String imagePath) {       //设置头像
         if (imagePath != null) {
             Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
             final BitmapDrawable bd = new BitmapDrawable(bitmap);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 profile.setImageDrawable(bd);
             }
-            //设置背景
         } else {
             Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void loadProfileFromServer() {            //加载网络图片
+    private void loadProfileFromServer() {            //加载网络头像
         String profilePath = Test.getInstance().user.getHeadPortrail();
         if (!profilePath.equals("")) {
             Glide.with(this).load(profilePath)
@@ -276,7 +280,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
 
-    public void getLocation() {
+    public void getLocation() {     //获取定位信息
 
         AMapLocationClient locationClient = new AMapLocationClient(StartActivity.this);
         locationClient.setLocationListener(this);
@@ -323,7 +327,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                     editor.apply();
                     Test.getInstance().user = null;
                     Test.getInstance().loginOrNot = 0;    //设置未登陆
-                    Intent intent = new Intent(this, LoadActivity.class);
+                    intent.setClass(this, LoadActivity.class);
                     startActivity(intent);
                 }
                 break;
@@ -334,11 +338,15 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                     changePasswd();
                 }
                 break;
+            case R.id.notify:
+                intent.setClass(this, NotifyActivity.class);
+                startActivity(intent);
+                break;
         }
         return true;
     }
 
-    private void changePasswd() {
+    private void changePasswd() {       //修改密码
 
         @SuppressLint("InflateParams") View view = LayoutInflater.from(this).inflate(R.layout.dialog_chang_passwd, null);
         final EditText op = view.findViewById(R.id.old_passwd);
@@ -350,21 +358,27 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String sOp = op.getText().toString().trim();
-                        String sNp = np.getText().toString().trim();  //后台未完成
-                      /*  RequestBody requestBody=new FormBody.Builder()
+                        String sNp = np.getText().toString().trim();
+                        RequestBody requestBody = new FormBody.Builder()
+                                .add("user_id", Test.getInstance().user.getUserId())
+                                .add("old_password", sOp)
+                                .add("new_password", sNp)
                                 .build();
-                        Request request=new Request.Builder()
-                                .url("")
+                        Request request = new Request.Builder()
+                                .url("http://120.77.170.124:8080/busis/user/modify/password.do")
                                 .post(requestBody)
                                 .build();
-                        Util util=new Util();
+                        Util util = new Util();
                         util.setHandleResponse(new Util.handleResponse() {
                             @Override
                             public void handleResponses(String response) {
 
+                                ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<String>>() {
+                                }.getType());
+                                sendMessage(responseData.getMessage());
                             }
                         });
-                        util.doPost(StartActivity.this,request);*/
+                        util.doPost(StartActivity.this, request);
 
 
                     }
@@ -387,7 +401,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     @TargetApi(19)
-    private void handleImageOnKitKat(Intent data) {
+    private void handleImageOnKitKat(Intent data) {     //头像处理 4.4之后可用
         String imagePath = null;
         Uri uri = data.getData();
         if (DocumentsContract.isDocumentUri(this, uri)) {
@@ -410,14 +424,16 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             }
         }                       //读取图片路径
 
+        //保存图片到本地
+        savePicPathToLocal(imagePath);
+
         //设置头像
         setProfile(imagePath);
 
         //保存图片到服务器
         savePicPathToServer(imagePath);
 
-        //保存图片到本地
-        savePicPathToLocal(imagePath);
+
 
 
     }
@@ -426,12 +442,12 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("head_portrail", imagePath, RequestBody.create(MediaType.parse("image/*"), new File(imagePath)))
+                .addFormDataPart("file", imagePath, RequestBody.create(MediaType.parse("image/*"), new File(imagePath)))
                 .addFormDataPart("user_id", Test.getInstance().user.getUserId())
                 .build();
 
         Request request = new Request.Builder()
-                .url("http://120.77.170.124:8080/busis/user/modify/head_portrail.do")
+                .url("http://120.77.170.124:8080/busis/user/modify/head_portrail/file.do")
                 .post(requestBody)
                 .build();
 
@@ -453,13 +469,13 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     public void savePicPathToLocal(final String picPath) {
-        SharedPreferences.Editor editor = getSharedPreferences("sher"+Test.getInstance().user.getUserId(), MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences("sher" + Test.getInstance().user.getUserId(), MODE_PRIVATE).edit();
         editor.putString("pic_path", picPath);
         editor.apply();     //存本地
     }
 
     public String readPicPathFromLocal() {
-        SharedPreferences preferences = getSharedPreferences("sher"+Test.getInstance().user.getUserId(), MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("sher" + Test.getInstance().user.getUserId(), MODE_PRIVATE);
         return preferences.getString("pic_path", "");
     }
 

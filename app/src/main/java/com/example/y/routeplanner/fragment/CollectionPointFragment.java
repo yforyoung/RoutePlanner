@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 
 
 import com.amap.api.maps.model.LatLng;
+import com.example.y.routeplanner.BaseActivity;
 import com.example.y.routeplanner.SearchPointActivity;
 import com.example.y.routeplanner.R;
 import com.example.y.routeplanner.adapter.CollectionPointAdapter;
@@ -53,18 +54,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
     private List<CollectionPoint> list;
     private User user;
     private CollectionPointAdapter adapter;
-    @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    adapter.notifyDataSetChanged();
-                    break;
-            }
-        }
-    };
 
     @Nullable
     @Override
@@ -110,15 +99,14 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
             @Override
             public void handleResponses(String response) {
                 Log.i(TAG, "onResponse:收藏点 " + response);
-                Message message = new Message();
+
                 ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionPoint>>>() {
                 }.getType());
                 if (responseData.getCode() == 1) {
                     list.clear();
                     List<CollectionPoint> collectionPoints = (List<CollectionPoint>) responseData.getData();
                     list.addAll(collectionPoints);
-                    message.what = 1;
-                    handler.sendMessage(message);
+                    ((BaseActivity)getActivity()).sendMessage(adapter);
                 }
             }
         });
@@ -176,13 +164,13 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
                     public void onResponse(Call call, Response response) throws IOException {
                         String s = response.body().string();
                         Log.i(TAG, "onResponse:删除点 " + s);
-                        Message message = new Message();
+
                         ResponseData responseData = new Gson().fromJson(s, new TypeToken<ResponseData<String>>() {
                         }.getType());
                         if (responseData.getCode() == 1) {
                             list.remove(position);
-                            message.what = 1;
-                            handler.sendMessage(message);
+                            ((BaseActivity)getActivity()).sendMessage(adapter);
+
                         }
                     }
                 });
