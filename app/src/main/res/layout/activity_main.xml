@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#fff">
 
+
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -47,9 +48,7 @@
 
         <include layout="@layout/content" />
     </LinearLayout>
-
-        <!-- <include layout="@layout/nav_header" />-->
-        <android.support.design.widget.NavigationView
+     <android.support.design.widget.NavigationView
             android:id="@+id/navigation"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
@@ -59,176 +58,5 @@
             app:menu="@menu/nav_menu">
 
         </android.support.design.widget.NavigationView>
-
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="#000" />
-
-            <LinearLayout
-                android:id="@+id/search_location"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="left|bottom"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                tools:ignore="RtlHardcoded">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_place" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="地点位置查询"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="#000" />
-
-            <LinearLayout
-                android:id="@+id/search_bus_path"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="left|bottom"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                tools:ignore="RtlHardcoded">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_route" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="换乘路线查询"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="#000" />
-
-            <LinearLayout
-                android:id="@+id/search_bus_line"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="left|bottom"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                tools:ignore="RtlHardcoded">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_bus" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="公交线路查询"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="#000" />
-
-            <LinearLayout
-                android:id="@+id/search_bus_step"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="left|bottom"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                tools:ignore="RtlHardcoded">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_station" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="公交站台查询"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="#000" />
-
-            <LinearLayout
-                android:id="@+id/collection"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="left|bottom"
-                android:layout_weight="1"
-                android:background="@color/colorWhite"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="5dp"
-                tools:ignore="RtlHardcoded">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_star_black_24dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:text="收藏夹"
-                    android:textColor="#000"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>-->
-
 
 </android.support.v4.widget.DrawerLayout>

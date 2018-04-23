@@ -4,20 +4,20 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -44,6 +44,10 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.amap.api.services.district.DistrictItem;
+import com.amap.api.services.district.DistrictResult;
+import com.amap.api.services.district.DistrictSearch;
+import com.amap.api.services.district.DistrictSearchQuery;
 import com.bumptech.glide.Glide;
 import com.example.y.routeplanner.adapter.RollPagerAdapter;
 import com.example.y.routeplanner.gson.ResponseData;
@@ -56,7 +60,6 @@ import com.jude.rollviewpager.RollPagerView;
 import com.jude.rollviewpager.hintview.ColorPointHintView;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,11 +77,13 @@ import okhttp3.RequestBody;
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int OPEN_ALBUM = 6;
+    private static final int GPS_REQUEST_CODE = 7;
     private TextView name, tel, cityShow;
     private Button load;
     private LinearLayout view;
     private DrawerLayout drawerLayout;
     private CircleImageView profile;
+    private int isSetOpen = 0;
     Intent intent;
 
     private String[] permissions = new String[]{
@@ -96,11 +101,39 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         intent = new Intent();
-
         request();          //请求权限
         initView();         //初始化视图
-        util = new Util();
         getLocation();
+        util = new Util();
+
+
+    }
+
+    private void openGPS() {
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("GPS功能未开启,是否前往设置？")
+                .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivityForResult(intent, GPS_REQUEST_CODE);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                })
+                .show();
+    }
+
+    private boolean isGPSOpen() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        assert locationManager != null;
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+
     }
 
 
@@ -132,7 +165,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         profile = navigationView.getHeaderView(0).findViewById(R.id.user_profile);
         view = navigationView.getHeaderView(0).findViewById(R.id.user_info_view);
 
-
         LinearLayout searchLocation = findViewById(R.id.search_location);
         LinearLayout searchBusPath = findViewById(R.id.search_bus_path);
         LinearLayout collection = findViewById(R.id.collection);
@@ -148,6 +180,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         collection.setOnClickListener(this);
         searchBusLine.setOnClickListener(this);
         searchBusStep.setOnClickListener(this);
+        cityShow.setOnClickListener(this);
 
 
     }
@@ -183,7 +216,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
                     boolean showRequestPermission = ActivityCompat.shouldShowRequestPermissionRationale(StartActivity.this, permissions[i]);
                     if (showRequestPermission) {
-                        Toast.makeText(this, "您拒绝了权限，定位功能将无法正常使用！", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "您拒绝了权限,定位功能将无法正常使用！", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -194,7 +227,15 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
+        if (isGPSOpen() && isSetOpen == 1) {
+            getLocation();
+            isSetOpen = 0;
+        } else if (!isGPSOpen()) {
+            openGPS();
+            isSetOpen = 1;
+        }
         initUserInfo();     //初始化用户信息
+
     }
 
     @Override
@@ -227,11 +268,59 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                 intent.setClass(this, CollectionActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.city_show:
+                showCity();
+                break;
         }
     }
 
-    private void initUserInfo() {
+    private void showCity() {
+        final String provence[] = new String[]{"北京市", "天津市", "上海市", "重庆市",
+                "河北省", "山西省", "辽宁省", "吉林省", "黑龙江省", "江苏省",
+                "浙江省", "安徽省", "福建省", "江西省", "山东省", "河南省", "湖北省",
+                "湖南省", "广东省", "海南省", "四川省", "贵州省", "云南省", "陕西省",
+                "甘肃省", "青海省", "台湾省", "内蒙古自治区", "广西壮族自治区", "西藏自治区",
+                "宁夏回族自治区", "新疆维吾尔自治区", "香港特别行政区", "澳门特别行政区"};
+        new AlertDialog.Builder(this)
+                .setItems(provence, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        queryCityCode(provence[i]);
+                    }
+                })
+                .show();
+    }
 
+    private void queryCityCode(String keywords) {
+        DistrictSearch search = new DistrictSearch(this);
+        DistrictSearchQuery query = new DistrictSearchQuery();
+        query.setKeywords(keywords);//传入关键字
+        query.setShowBoundary(true);//是否返回边界值
+        search.setQuery(query);
+        search.setOnDistrictSearchListener(new DistrictSearch.OnDistrictSearchListener() {
+            @Override
+            public void onDistrictSearched(DistrictResult districtResult) {
+                final List<DistrictItem> sub = districtResult.getDistrict().get(0).getSubDistrict();
+                final String city[] = new String[sub.size()];
+                for (int i = 0; i < sub.size(); i++) {
+                    city[i] = sub.get(i).getName();
+                }
+                new AlertDialog.Builder(StartActivity.this)
+                        .setItems(city, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Test.getInstance().cityCode = sub.get(i).getCitycode();
+                                cityShow.setText(city[i]);
+                            }
+                        })
+                        .setNegativeButton("返回", null)
+                        .show();
+            }
+        });//绑定监听器
+        search.searchDistrictAsyn();
+    }
+
+    private void initUserInfo() {
         SharedPreferences spf = getSharedPreferences("user", MODE_PRIVATE);
         if (spf.getInt("login", 0) == 1) {                       //获取本地用户信息,设置单例
             Test.getInstance().loginOrNot = 1;
@@ -241,16 +330,15 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             view.setVisibility(View.VISIBLE);
             name.setText(user.getUserName());
             tel.setText(user.getTelphone());
+            String imgPath;
 
             if (!readPicPathFromLocal().equals("")) {       //设置头像 本地有则读取本地图片 无则加载网络图片
-                File file = new File(readPicPathFromLocal());
-                if (file.exists())
-                    setProfile(readPicPathFromLocal());
-                else
-                    loadProfileFromServer();
+                imgPath = readPicPathFromLocal();
             } else {
-                loadProfileFromServer();
+                imgPath = user.getHeadPortrail();
             }
+            Log.i("data", "initUserInfo: " + imgPath);
+            setProfile(imgPath);
         } else {
             view.setVisibility(View.GONE);
             load.setVisibility(View.VISIBLE);
@@ -259,24 +347,9 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void setProfile(final String imagePath) {       //设置头像
-        if (imagePath != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-            final BitmapDrawable bd = new BitmapDrawable(bitmap);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                profile.setImageDrawable(bd);
-            }
-        } else {
-            Toast.makeText(this, "获取图片失败", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void loadProfileFromServer() {            //加载网络头像
-        String profilePath = Test.getInstance().user.getHeadPortrail();
-        if (!profilePath.equals("")) {
-            Glide.with(this).load(profilePath)
-                    .error(R.drawable.load_error)
-                    .into(profile);
-        }
+        Glide.with(this).load(imagePath).placeholder(R.drawable.ic_launcher_background)
+                .dontAnimate()
+                .into(profile);
     }
 
 
@@ -397,6 +470,12 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
                         handleImageOnKitKat(data);
                     }
                 }
+                break;
+            case GPS_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    getLocation();
+                }
+                break;
         }
     }
 
@@ -432,8 +511,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
 
         //保存图片到服务器
         savePicPathToServer(imagePath);
-
-
 
 
     }

@@ -1,6 +1,7 @@
 package com.example.y.routeplanner.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,8 +38,13 @@ public class BusStepAdapter extends RecyclerView.Adapter<BusStepAdapter.ViewHold
     @Override
     public void onBindViewHolder(BusStepAdapter.ViewHolder holder, int position) {
         String s = list.get(position).getBusLineName();
+        if (s.contains("停运")){
+            s=s.replaceFirst("\\(","[");
+        }
         s = s.replaceFirst("\\(", "\n");
+        s=s.replaceFirst("\\)","]");
         s = s.substring(0, s.length() - 1);
+
 
         holder.name.setText(s.split("\n")[0]);
         holder.forward.setText(s.split("\n")[1]);

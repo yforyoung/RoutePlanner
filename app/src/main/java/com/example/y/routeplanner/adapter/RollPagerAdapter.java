@@ -9,9 +9,8 @@ import com.example.y.routeplanner.R;
 import com.jude.rollviewpager.adapter.StaticPagerAdapter;
 
 public class RollPagerAdapter extends StaticPagerAdapter {
-    private int img[] = {R.drawable.roll_1,
-            R.drawable.roll_2,
-            R.drawable.roll_3};
+    private int img[] = {R.drawable.roll_3,R.drawable.roll_1,
+            R.drawable.roll_2};
 
     @Override
     public View getView(ViewGroup container, int position) {

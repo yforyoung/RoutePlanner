@@ -88,8 +88,14 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         setContentView(R.layout.activity_search_path);
         initView();
         aMLocation = Test.getInstance().aMapLocation;
-        cityCode = Test.getInstance().cityCode;
-        from = new LatLonPoint(aMLocation.getLatitude(), aMLocation.getLongitude());
+        if (aMLocation != null) {
+            from = new LatLonPoint(aMLocation.getLatitude(), aMLocation.getLongitude());
+            cityCode = Test.getInstance().cityCode;
+
+        }else{
+            Toast.makeText(this, "定位失败！请检查相关设置或网络状态", Toast.LENGTH_SHORT).show();
+            begin.setText("请输入起点");
+        }
 
 
         LinearLayoutManager manager = new LinearLayoutManager(SearchPathActivity.this);
@@ -161,9 +167,14 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                 String s = begin.getText().toString();
                 begin.setText(end.getText().toString());
                 end.setText(s);
-                LatLonPoint p = from;
-                from = to;
-                to = p;
+                if (from!=null){
+                    LatLonPoint p = from;
+                    from = to;
+                    to = p;
+                }else{
+                    Toast.makeText(this, "请选择一个起点！", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case R.id.search_button:
                 //搜索
@@ -211,7 +222,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                                     .url("http://120.77.170.124:8080/busis/collection/add.do")
                                     .post(requestBody)
                                     .build();
-                            Util util=new Util();
+                            Util util = new Util();
                             util.setHandleResponse(new Util.handleResponse() {
                                 @Override
                                 public void handleResponses(String response) {
@@ -221,7 +232,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                                     sendMessage(responseData.getMessage());
                                 }
                             });
-                           util.doPost(SearchPathActivity.this,request);
+                            util.doPost(SearchPathActivity.this, request);
                         }
                     }
                 })
