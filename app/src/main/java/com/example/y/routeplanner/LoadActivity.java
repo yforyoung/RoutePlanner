@@ -4,7 +4,6 @@ package com.example.y.routeplanner;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,7 +18,7 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-
+//登陆页面
 public class LoadActivity extends BaseActivity implements View.OnClickListener {
     private EditText telInput, passwordInput;
 
@@ -75,8 +74,6 @@ public class LoadActivity extends BaseActivity implements View.OnClickListener {
             util.setHandleResponse(new Util.handleResponse() {
                 @Override
                 public void handleResponses(String response) {
-
-                    Log.i("data", "handleResponses: "+response);
                     int code = Integer.parseInt(response.substring(8, 9));
                     if (code == 1) {
                         ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<User>>() {

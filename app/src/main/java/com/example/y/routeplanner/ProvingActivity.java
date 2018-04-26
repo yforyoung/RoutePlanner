@@ -2,7 +2,6 @@ package com.example.y.routeplanner;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,9 +17,7 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-import static android.content.ContentValues.TAG;
-
-public class ProvingActivity extends BaseActivity {          //用于验证码  修改密码、注册、找回密码
+public class ProvingActivity extends BaseActivity {          //验证码页面
     private String sCode = "";
     private Intent intent;
     private EditText code;
@@ -58,7 +55,6 @@ public class ProvingActivity extends BaseActivity {          //用于验证码  
     }
 
     private void changePasswd() {
-        //String tel = intent.getStringExtra("tel");
         String passwd = intent.getStringExtra("passwd");
         RequestBody requestBody = new FormBody.Builder()
                 .add("code", sCode)
@@ -72,7 +68,6 @@ public class ProvingActivity extends BaseActivity {          //用于验证码  
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "handleResponses: " + response);
                 sendMessage("密码已修改，请重新登陆");
                 Intent intent = new Intent(ProvingActivity.this, LoadActivity.class);
                 startActivity(intent);
@@ -106,12 +101,10 @@ public class ProvingActivity extends BaseActivity {          //用于验证码  
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "login: " + response);
                 int code = Integer.parseInt(response.substring(8, 9));
                 if (code == 1) {
                     ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<User>>() {
                     }.getType());
-                    Log.i(TAG, "login: " + response);
 
                     User user = (User) responseData.getData();
                     new Util().login(ProvingActivity.this, user);

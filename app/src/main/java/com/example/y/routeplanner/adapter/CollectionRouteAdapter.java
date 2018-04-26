@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.example.y.routeplanner.R;
 import com.example.y.routeplanner.gson.MyPath;
-
-import java.util.ArrayList;
 import java.util.List;
 
 

@@ -1,8 +1,5 @@
 package com.example.y.routeplanner.gson;
 
-import java.util.List;
-
-
 public class ResponseData <T>{
     private int code;
     private String message;

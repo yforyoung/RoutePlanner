@@ -29,7 +29,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,7 +72,7 @@ import okhttp3.MultipartBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-
+//主页面
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public class StartActivity extends BaseActivity implements View.OnClickListener, AMapLocationListener, NavigationView.OnNavigationItemSelectedListener {
     private static final int OPEN_ALBUM = 6;
@@ -337,7 +336,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
             } else {
                 imgPath = user.getHeadPortrail();
             }
-            Log.i("data", "initUserInfo: " + imgPath);
+
             setProfile(imgPath);
         } else {
             view.setVisibility(View.GONE);
@@ -531,8 +530,6 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-
-                Log.i("head", "handleResponses: " + response);
                 //保存到userFile
                 User user = Test.getInstance().user;
                 user.setHeadPortrail(response);

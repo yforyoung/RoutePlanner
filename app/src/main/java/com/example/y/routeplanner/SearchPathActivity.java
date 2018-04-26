@@ -13,7 +13,6 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 
@@ -61,9 +60,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 
-import static android.content.ContentValues.TAG;
 
-
+//查询换乘路线
 public class SearchPathActivity extends BaseActivity implements View.OnClickListener, RouteSearch.OnRouteSearchListener, RouteAdapter.OnItemClickListener {
     private TextView begin, end;
     private ImageView repeat, searchButon;
@@ -247,8 +245,6 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         busPaths.addAll(busRouteResult.getPaths());
         adapter.notifyDataSetChanged();
         //解析
-
-
     }
 
     @Override
@@ -322,12 +318,11 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                 t5.setTextColor(getResources().getColor(R.color.beginEnd));
                 t5.setText(endTip.getName() + "（终点）");
             }
-            myRoute.setStart(t1.getText().toString());//start
-            myRoute.setWalk(t2.getText().toString());//walk
+            myRoute.setStart(t1.getText().toString());
+            myRoute.setWalk(t2.getText().toString());
             myRoute.setBus(t4.getText().toString());
             myRoute.setEntrance(t3.getText().toString());
             myRoute.setOut(t5.getText().toString());
-            Log.i(TAG, "onItemClick: ");
             myRouteList.add(myRoute);
             popLinearLayout.addView(v1);
 

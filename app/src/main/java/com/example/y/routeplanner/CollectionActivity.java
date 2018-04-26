@@ -6,16 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-
 import android.view.MenuItem;
-
-
-
-
 import com.example.y.routeplanner.adapter.CollectionViewPagerAdapter;
 
 
-
+//收藏页面
 public class CollectionActivity extends BaseActivity implements BottomNavigationView.OnNavigationItemSelectedListener,ViewPager.OnPageChangeListener {
     private ViewPager collectionViewPager;
     private BottomNavigationView bottomNavigationView;

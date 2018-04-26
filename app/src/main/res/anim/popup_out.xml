@@ -5,7 +5,7 @@
     >
     <!-- 平移动画 -->
     <translate
-        android:duration="250"
+        android:duration="500"
         android:fromYDelta="0.0"
         android:toYDelta="100%" />
 

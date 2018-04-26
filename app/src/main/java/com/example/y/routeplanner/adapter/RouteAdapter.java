@@ -15,8 +15,6 @@ import com.example.y.routeplanner.R;
 import java.util.List;
 
 
-
-
 public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> implements AdapterView.OnClickListener {
     private List<BusPath> busPathList;
     private static final int MAX=100000;

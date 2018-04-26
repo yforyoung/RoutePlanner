@@ -11,7 +11,6 @@
         android:icon="@drawable/ic_edit"
         />
     <item
-        android:actionLayout="@layout/notify"
         android:id="@+id/notify"
         android:title="公告"
         android:icon="@drawable/ic_notifications"

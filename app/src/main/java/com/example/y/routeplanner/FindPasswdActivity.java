@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,7 +56,6 @@ public class FindPasswdActivity extends BaseActivity {      //找回密码
                             editor.putString("session_id",sessionId);
                             editor.apply();
 
-                            Log.i("code", "handleResponses: "+sessionId);
                             sendMessage("验证码已发送");
                         }
                     });

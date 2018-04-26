@@ -28,7 +28,7 @@ import java.util.List;
 
 
 @SuppressLint("Registered")
-public class SearchBusLineActivity extends BaseActivity implements BusLineSearch.OnBusLineSearchListener{
+public class SearchBusLineActivity extends BaseActivity implements BusLineSearch.OnBusLineSearchListener{//查询公交线路
     private TextView name, first, last, distance, price;
     private LinearLayout lineHead;
     private BusLineAdapter adapter;

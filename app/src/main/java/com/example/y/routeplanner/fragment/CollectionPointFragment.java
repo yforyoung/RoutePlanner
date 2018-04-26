@@ -13,12 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-
 import com.amap.api.maps.model.LatLng;
 import com.example.y.routeplanner.BaseActivity;
 import com.example.y.routeplanner.SearchPointActivity;
@@ -88,8 +85,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "onResponse:收藏点 " + response);
-
                 ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionPoint>>>() {
                 }.getType());
                 if (responseData.getCode() == 1) {
@@ -118,7 +113,6 @@ public class CollectionPointFragment extends Fragment implements CollectionPoint
 
     @Override
     public void onItemLongClick(View v, final int position) {
-        Log.i(TAG, "onItemLongClick: ");
         AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
         builder.setItems(new String[]{"删除"}, new DialogInterface.OnClickListener() {
             @Override

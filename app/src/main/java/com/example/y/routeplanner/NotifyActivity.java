@@ -1,8 +1,5 @@
 package com.example.y.routeplanner;
 
-import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Message;
 
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;

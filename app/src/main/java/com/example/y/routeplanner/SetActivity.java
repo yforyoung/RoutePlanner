@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,9 +31,8 @@ import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 
-
+//设置页面
 public class SetActivity extends BaseActivity implements View.OnClickListener, View.OnFocusChangeListener {
-    private static final String TAG = "setting";
     private EditText username, telephone, introduce;
     private TextView gender, birthday;
     private User user;
@@ -159,7 +157,6 @@ public class SetActivity extends BaseActivity implements View.OnClickListener, V
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "onResponse: " + response);
                 ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<User>>() {
                 }.getType());
                 if (responseData.getCode() == 1) {

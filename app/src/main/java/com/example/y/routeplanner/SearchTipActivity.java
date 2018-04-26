@@ -20,7 +20,7 @@ import com.example.y.routeplanner.util.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-
+//联想输入 使用高德地图接口
 public class SearchTipActivity extends BaseActivity implements Inputtips.InputtipsListener {
     private EditText search;
     private List<Tip> tipList;

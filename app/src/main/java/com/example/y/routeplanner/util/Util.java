@@ -4,17 +4,11 @@ package com.example.y.routeplanner.util;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
-
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-
-
 import com.example.y.routeplanner.StartActivity;
-
 import com.example.y.routeplanner.gson.User;
 import com.google.gson.Gson;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -23,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -127,9 +120,6 @@ public class Util {
         if (handleResponse!=null){
             handleResponse.handleResponses(s);
         }
-    }
-
-    public void doPost(Request request) {
     }
 
     public interface handleResponse{

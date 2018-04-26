@@ -11,7 +11,6 @@ import android.widget.TextView;
 import com.amap.api.services.help.Tip;
 import com.example.y.routeplanner.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -29,7 +28,7 @@ public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ViewHolder> impl
 
     }
 
-    public static interface OnItemClickListener{
+    public interface OnItemClickListener{
         void onItemClick(View v,int position);
     }
 
@@ -72,16 +71,13 @@ public class TipAdapter extends RecyclerView.Adapter<TipAdapter.ViewHolder> impl
             return 0;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView localName;
         TextView localType;
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             localName=itemView.findViewById(R.id.local_name);
             localType=itemView.findViewById(R.id.local_type);
-
-
-
         }
     }
 }

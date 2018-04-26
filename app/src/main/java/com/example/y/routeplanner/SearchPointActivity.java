@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
-
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -44,8 +42,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 
-import static android.content.ContentValues.TAG;
-
+//查询地点
 
 public class SearchPointActivity extends BaseActivity implements LocationSource, AMapLocationListener {
 
@@ -138,7 +135,6 @@ public class SearchPointActivity extends BaseActivity implements LocationSource,
                             util.setHandleResponse(new Util.handleResponse() {
                                 @Override
                                 public void handleResponses(String response) {
-                                    Log.i(TAG, "onResponse:   " + response);
                                     ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
                                     }.getType());
                                     sendMessage(responseData.getMessage());

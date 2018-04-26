@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,7 +90,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
         util.setHandleResponse(new Util.handleResponse() {
             @Override
             public void handleResponses(String response) {
-                Log.i(TAG, "onResponse: " + response);
                 ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<List<CollectionRoute>>>() {
                 }.getType());
 
@@ -158,7 +156,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
 
     @Override
     public void onItemLongClick(View v, final int position) {
-        Log.i(TAG, "onItemLongClick: ");
         AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
         builder.setItems(new String[]{"删除"}, new DialogInterface.OnClickListener() {
             @Override

@@ -23,7 +23,7 @@ import com.example.y.routeplanner.util.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchBusStepActivity extends BaseActivity implements BusStationSearch.OnBusStationSearchListener{
+public class SearchBusStepActivity extends BaseActivity implements BusStationSearch.OnBusStationSearchListener{//查询公交站台
     private TextView stationName;
     private BusStepAdapter adapter;
 

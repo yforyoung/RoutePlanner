@@ -58,7 +58,7 @@
 
         <activity android:name=".ProvingActivity" />
         <activity android:name=".FindPasswdActivity" />
-        <activity android:name=".NotifyActivity"></activity>
+        <activity android:name=".NotifyActivity" />
     </application>
 
 </manifest>
