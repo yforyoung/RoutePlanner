@@ -82,8 +82,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     private LinearLayout view;
     private DrawerLayout drawerLayout;
     private CircleImageView profile;
-    private int isSetOpen = 0;
-    Intent intent;
+    private Intent intent;
 
     private String[] permissions = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -226,12 +225,11 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onResume() {
         super.onResume();
-        if (isGPSOpen() && isSetOpen == 1) {
-            getLocation();
-            isSetOpen = 0;
-        } else if (!isGPSOpen()) {
+        if (!isGPSOpen()){
             openGPS();
-            isSetOpen = 1;
+        }
+        if (Test.getInstance().isSetLocation == 0) {//判断是否定位位置信息
+            getLocation();
         }
         initUserInfo();     //初始化用户信息
 

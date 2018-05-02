@@ -12,6 +12,7 @@ public class Test {
     public User user;
     public int loginOrNot=0;
     public String cityCode="";
+    public int isSetLocation=0;
     public AMapLocation aMapLocation=null;
 
     public static Test getInstance(){
