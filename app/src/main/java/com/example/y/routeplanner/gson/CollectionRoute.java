@@ -2,6 +2,7 @@ package com.example.y.routeplanner.gson;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 
 
 public class CollectionRoute {
@@ -14,13 +15,13 @@ public class CollectionRoute {
     private String  end_longitude ;
     private String  end_latitude;
     private String  area ;
-    private MyPath  route_information ;
+    private List<String> route_information ;
     private int  user_id;
 
     public CollectionRoute() {
     }
 
-    public CollectionRoute(int collectionID, String start_point, String end_point, String start_longitude, String start_latitude, String end_longitude, String end_latitude, String area, MyPath route_information, int user_id) {
+    public CollectionRoute(int collectionID, String start_point, String end_point, String start_longitude, String start_latitude, String end_longitude, String end_latitude, String area, List<String> route_information, int user_id) {
         this.collectionID = collectionID;
         this.start_point = start_point;
         this.end_point = end_point;
@@ -97,11 +98,11 @@ public class CollectionRoute {
         this.area = area;
     }
 
-    public MyPath getRoute_information() {
+    public List<String> getRoute_information() {
         return route_information;
     }
 
-    public void setRoute_information(MyPath route_information) {
+    public void setRoute_information(List<String> route_information) {
         this.route_information = route_information;
     }
 

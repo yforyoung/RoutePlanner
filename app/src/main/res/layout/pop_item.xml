@@ -24,16 +24,19 @@
 
     <TextView
         android:id="@+id/bus_name"
-        android:text=""
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:background="@drawable/bus_line_name_bg"
         android:textSize="18sp"
         android:textColor="#fff"
         android:textStyle="bold"
-        android:padding="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp" />
 
     <TextView
         android:id="@+id/bus_begin"

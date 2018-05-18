@@ -18,7 +18,6 @@ import android.view.LayoutInflater;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -38,27 +37,19 @@ import com.amap.api.services.route.RouteBusLineItem;
 import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkRouteResult;
 import com.example.y.routeplanner.adapter.RouteAdapter;
-
-import com.example.y.routeplanner.gson.MyPath;
-import com.example.y.routeplanner.gson.MyRoute;
 import com.example.y.routeplanner.gson.ResponseData;
 import com.example.y.routeplanner.gson.Result;
 import com.example.y.routeplanner.util.Test;
-
 import com.example.y.routeplanner.util.Util;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
-
 import okhttp3.FormBody;
-
 import okhttp3.Request;
 import okhttp3.RequestBody;
-
 
 
 //查询换乘路线
@@ -76,8 +67,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
     private View popContentView;
     private LinearLayout popLinearLayout;
     private Tip fromTip, endTip;
-    private List<MyRoute> myRouteList = new ArrayList<>();
-    private MyPath myPath;
+    private ArrayList<String> busLineNameSave = new ArrayList<>();
 
     @SuppressLint("InflateParams")
     @Override
@@ -90,7 +80,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
             from = new LatLonPoint(aMLocation.getLatitude(), aMLocation.getLongitude());
             cityCode = Test.getInstance().cityCode;
 
-        }else{
+        } else {
             Toast.makeText(this, "定位失败！请检查相关设置或网络状态", Toast.LENGTH_SHORT).show();
             begin.setText("请输入起点");
         }
@@ -165,11 +155,11 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                 String s = begin.getText().toString();
                 begin.setText(end.getText().toString());
                 end.setText(s);
-                if (from!=null){
+                if (from != null) {
                     LatLonPoint p = from;
                     from = to;
                     to = p;
-                }else{
+                } else {
                     Toast.makeText(this, "请选择一个起点！", Toast.LENGTH_SHORT).show();
                 }
 
@@ -194,44 +184,46 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
     }
 
     private void collectionRoute() {
-        final EditText et = new EditText(SearchPathActivity.this);
 
-        new AlertDialog.Builder(SearchPathActivity.this).setTitle("请输入收藏路线名")
-                .setView(et)
+
+        new AlertDialog.Builder(SearchPathActivity.this).setTitle("确定收藏本路线？")
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String input = et.getText().toString();
-                        if (input.equals("")) {
-                            Toast.makeText(SearchPathActivity.this, "路线名不能为空！" + input, Toast.LENGTH_LONG).show();
-                        } else {
-                            myPath = new MyPath(input, myRouteList);
-                            Gson gson = new Gson();
-                            final String data = gson.toJson(myPath);
-
-                            RequestBody requestBody = new FormBody.Builder()
-                                    .add("start_longitude", from.getLongitude() + "")
-                                    .add("start_latitude", from.getLatitude() + "")
-                                    .add("end_longitude", to.getLongitude() + "")
-                                    .add("end_latitude", to.getLatitude() + "")
-                                    .add("user_id", Test.getInstance().user.getUserId() + "")
-                                    .add("route_information", data)
-                                    .build();
-                            Request request = new Request.Builder()
-                                    .url("http://120.77.170.124:8080/busis/collection/add.do")
-                                    .post(requestBody)
-                                    .build();
-                            Util util = new Util();
-                            util.setHandleResponse(new Util.handleResponse() {
-                                @Override
-                                public void handleResponses(String response) {
-
-                                    ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
-                                    }.getType());
-                                    sendMessage(responseData.getMessage());
-                                }
-                            });
-                            util.doPost(SearchPathActivity.this, request);
+                        String fromName;
+                        if (fromTip==null){
+                            fromName=aMLocation.getPoiName();
+                        }else {
+                            fromName=fromTip.getName();
                         }
+                        Gson gson = new Gson();
+                        final String data = gson.toJson(busLineNameSave);
+                        RequestBody requestBody = new FormBody.Builder()
+                                .add("start_longitude", from.getLongitude() + "")
+                                .add("start_latitude", from.getLatitude() + "")
+                                .add("end_longitude", to.getLongitude() + "")
+                                .add("end_latitude", to.getLatitude() + "")
+                                .add("start_point",fromName)
+                                .add("area",aMLocation.getCity())
+                                .add("end_point", endTip.getName())
+                                .add("user_id", Test.getInstance().user.getUserId() + "")
+                                .add("route_information", data)
+                                .build();
+                        Request request = new Request.Builder()
+                                .url("http://120.77.170.124:8080/busis/collection/add.do")
+                                .post(requestBody)
+                                .build();
+                        Util util = new Util();
+                        util.setHandleResponse(new Util.handleResponse() {
+                            @Override
+                            public void handleResponses(String response) {
+
+                                ResponseData responseData = new Gson().fromJson(response, new TypeToken<ResponseData<Result>>() {
+                                }.getType());
+                                sendMessage(responseData.getMessage());
+                            }
+                        });
+                        util.doPost(SearchPathActivity.this, request);
+
                     }
                 })
                 .setNegativeButton("取消", null)
@@ -270,10 +262,11 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
         BusPath busPath = busPaths.get(position);
         List<BusStep> stepList = busPath.getSteps();
         popLinearLayout.removeAllViews();
-        myRouteList.clear();
+
+        busLineNameSave.clear();
 
         for (int i = 0; i < stepList.size(); i++) {
-            MyRoute myRoute = new MyRoute();
+
             BusStep busStep = stepList.get(i);
             @SuppressLint("InflateParams") View v1 = getLayoutInflater().inflate(R.layout.pop_item, null);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -303,11 +296,12 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
 
             List<RouteBusLineItem> routeBusLineItems = busStep.getBusLines();    //为空
 
-            if (routeBusLineItems.size() > 0) {
+            if (routeBusLineItems.size() > 0) {//多个
 
                 t3.setText(routeBusLineItems.get(0).getDepartureBusStation().getBusStationName() + "上车");//出发站
 
-                t4.setText(routeBusLineItems.get(0).getBusLineName());//线路名
+                t4.setText(routeBusLineItems.get(0).getBusLineName().substring(0, routeBusLineItems.get(0).getBusLineName().indexOf("(") - 1) + "路");//线路名
+                busLineNameSave.add(t4.getText().toString());
 
                 t5.setText(routeBusLineItems.get(0).getArrivalBusStation().getBusStationName() + "下车");//到达点
 
@@ -318,12 +312,7 @@ public class SearchPathActivity extends BaseActivity implements View.OnClickList
                 t5.setTextColor(getResources().getColor(R.color.beginEnd));
                 t5.setText(endTip.getName() + "（终点）");
             }
-            myRoute.setStart(t1.getText().toString());
-            myRoute.setWalk(t2.getText().toString());
-            myRoute.setBus(t4.getText().toString());
-            myRoute.setEntrance(t3.getText().toString());
-            myRoute.setOut(t5.getText().toString());
-            myRouteList.add(myRoute);
+
             popLinearLayout.addView(v1);
 
         }
