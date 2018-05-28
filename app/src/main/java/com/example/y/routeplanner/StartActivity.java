@@ -344,8 +344,7 @@ public class StartActivity extends BaseActivity implements View.OnClickListener,
     }
 
     private void setProfile(final String imagePath) {       //设置头像
-        Glide.with(this).load(imagePath).placeholder(R.drawable.ic_launcher_background)
-                .dontAnimate()
+        Glide.with(this).load(imagePath)
                 .into(profile);
     }
 

@@ -30,7 +30,6 @@ import com.amap.api.services.route.RouteSearch;
 import com.amap.api.services.route.WalkRouteResult;
 import com.example.y.routeplanner.BaseActivity;
 import com.example.y.routeplanner.R;
-import com.example.y.routeplanner.SearchPathActivity;
 import com.example.y.routeplanner.adapter.CollectionRouteAdapter;
 import com.example.y.routeplanner.gson.CollectionRoute;
 import com.example.y.routeplanner.gson.ResponseData;
@@ -55,7 +54,6 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
     private CollectionRouteAdapter adapter;
     private List<CollectionRoute> list = new ArrayList<>();
     private Util util = new Util();
-    private LatLonPoint from, end;
     private CollectionRoute collectionRoute;
 
     @Nullable
@@ -125,9 +123,9 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
 
     private void searchRout(final CollectionRoute collectionRoute) {
         RouteSearch routeSearch = new RouteSearch(getActivity());
-        from = new LatLonPoint(Double.parseDouble(collectionRoute.getStart_latitude())
+        LatLonPoint from = new LatLonPoint(Double.parseDouble(collectionRoute.getStart_latitude())
                 , Double.parseDouble(collectionRoute.getStart_longitude()));
-        end = new LatLonPoint(Double.parseDouble(collectionRoute.getEnd_latitude())
+        LatLonPoint end = new LatLonPoint(Double.parseDouble(collectionRoute.getEnd_latitude())
                 , Double.parseDouble(collectionRoute.getEnd_longitude()));
         RouteSearch.FromAndTo fromAndTo = new RouteSearch.FromAndTo(
                 from,
@@ -170,7 +168,7 @@ public class CollectionRouteFragment extends Fragment implements CollectionRoute
 
     @SuppressLint("SetTextI18n")
     private void showCollectionRoute(BusPath b) {
-        View popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
+        @SuppressLint("InflateParams") View popContentView = LayoutInflater.from(getActivity()).inflate(R.layout.pop_window_bus_path, null);
         LinearLayout popLinearLayout = popContentView.findViewById(R.id.pop_linear_layout);
         LinearLayout co = popContentView.findViewById(R.id.coll_button);
         co.setVisibility(View.INVISIBLE);
